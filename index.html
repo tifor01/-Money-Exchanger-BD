@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Money Exchanger BD</title>
     
+    <!-- PRECONNECT FOR FASTER LOADING -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,6 +50,10 @@
                         modalPop: {
                             '0%': { transform: 'scale(0.9)', opacity: '0' },
                             '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
                         }
                     }
                 }
@@ -180,14 +185,14 @@
             z-index: 10;
         }
         
-        /* Spinner */
+        /* Spinner Fixed */
         .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #10B981;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-left-color: #ffffff;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin-fast 1s linear infinite;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
         }
     </style>
 </head>
@@ -202,12 +207,14 @@
     <!-- CONFIG Section -->
     <script>
         // ✅ ফারিদের লিংক (Direct String)
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7Qarj0lbq4s32rGnsPGWHUR73rIy1jD54ccNLbrLq1n-_h2XRyxGrK1t0bfb8-9klDw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTOfvixbK05m58AoCuHF1BsEj-hAfBudNXTVfEXdQ9U-fOtouicfZU1xSIF5MVeVu3ZA/exec";
 
         const CONFIG = {
             whatsappNumber: "8801309559570",
+            
+            // ⏰ দোকান খোলার সময় (২৪ ঘণ্টা ফরম্যাট)
             openingHour: 8,  // সকাল ৮টা
-            closingHour: 24, // রাত ১২টা (24:00)
+            closingHour: 20, // রাত ৮টা (20 means 8 PM)
             
             maxBDTValue: 500,
 
@@ -228,16 +235,17 @@
                 tallykhata: "01309559570",
                 redotpay: "1589529007",
                 bitget: "7487995164",
-                binance: "add letter", 
-                mexc: "add letter"
+                binance: "864824214", 
+                mexc: "07845031"
             },
+            // ✅ FIXED: NOTICE OBJECT (Important to prevent undefined error)
             notice: {
-                bn: "🌐 আমাদের সার্ভিস সকাল ৮টা থেকে রাত ১২টা পর্যন্ত চালু থাকে। বিশ্বের সবচেয়ে দ্রুততম এক্সচেঞ্জ সার্ভিস।",
-                en: "🌐 Our service is available from 8 AM to 12 AM. The world's fastest exchange service."
+                bn: "🌐 আমাদের সার্ভিস সকাল ৮টা থেকে রাত ৮টা পর্যন্ত চালু থাকে। বিশ্বের সবচেয়ে দ্রুততম এক্সচেঞ্জ সার্ভিস।",
+                en: "🌐 Our service is available from 8 AM to 8 PM. The world's fastest exchange service."
             }
         };
 
-        const CLICK_SOUND = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"); 
+        // ❌ SOUND REMOVED
     </script>
 
     <!-- Header -->
@@ -435,7 +443,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label id="senderLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">সেন্ডার নাম্বার</label>
-                                    <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                    <!-- ✅ 11 Digit limit & slice -->
+                                    <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" maxlength="11" oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all">
                                     <p id="senderError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
                                 <div class="relative">
@@ -445,7 +454,7 @@
                                 </div>
                             </div>
 
-                            <!-- ✅ DATE & TIME INPUT (Manual Keyboard & AM/PM Select) -->
+                            <!-- ✅ DATE & TIME INPUT -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label class="block text-gray-400 text-xs mb-1.5 ml-1">তারিখ (Date)</label>
@@ -463,18 +472,9 @@
                                     </div>
                                     <p class="text-[10px] text-red-300 mt-1 ml-1 flex items-start gap-1 leading-tight">
                                         <i class="fa-solid fa-info-circle text-red-400 mt-0.5"></i>
-                                        <span>সময় টাইপ করে এবং AM/PM সিলেক্ট করে দিন।</span>
+                                        <span>যেই সময়ে আপনার একাউন্ট থেকে আমাদেরকে টাকা পাঠিয়েছেন।</span>
                                     </p>
                                 </div>
-                            </div>
-
-                            <!-- ✅ WHATSAPP NUMBER INPUT (FIXED VALIDATION) -->
-                            <div class="relative">
-                                <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
-                                    <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
-                                </label>
-                                <input type="tel" id="userWhatsapp" placeholder="01xxxxxxxxx" inputmode="numeric" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
-                                <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
                             </div>
 
                             <!-- Receiver Info -->
@@ -489,6 +489,17 @@
                                 <p id="receiverError" class="text-[10px] text-red-400 mt-1 hidden"></p>
                                 <p class="text-[10px] text-gray-500 mt-1 ml-1" id="receiverHint"></p>
                             </div>
+
+                            <!-- ✅ WHATSAPP NUMBER INPUT (AT BOTTOM & LIMIT ADDED) -->
+                            <div class="relative">
+                                <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
+                                </label>
+                                <!-- ✅ 11 Digit limit & slice -->
+                                <input type="tel" id="userWhatsapp" placeholder="01xxxxxxxxx" inputmode="numeric" maxlength="11" oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all">
+                                <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
+                            </div>
+
                         </div>
 
                         <!-- Submit Button -->
@@ -576,7 +587,7 @@
                 <a href="https://wa.me/8801309559570" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fa-brands fa-whatsapp text-xl"></i>
                 </a>
-                <a href="https://t.me/mebdofficialchannel" target="_blank" class="w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white flex items-center justify-center transition-all">
+                <a href="https://t.me/mexbdofficialchannel2026" target="_blank" class="w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fa-brands fa-telegram text-xl"></i>
                 </a>
             </div>
@@ -634,6 +645,11 @@
                     </button>
                 </div>
 
+                <!-- ADDED: Loading indicator container if needed separately, though using button spinner -->
+                <div id="trackLoading" class="hidden text-center py-4">
+                    <i class="fa-solid fa-circle-notch fa-spin text-emerald-400 text-2xl"></i>
+                </div>
+
                 <div id="trackResult" class="hidden mt-4 space-y-3">
                     <!-- Status Badge -->
                     <div class="flex justify-center">
@@ -652,8 +668,8 @@
                             <span id="trackTrxIdDisplay" class="text-white eng-font select-all"></span>
                         </div>
                         <!-- Sender Last Digits (If Available) -->
-                        <div class="flex justify-between" id="trackSenderRow">
-                             <span class="text-gray-400">Sender No:</span>
+                        <div class="flex justify-between hidden" id="trackSenderRow">
+                             <span class="text-gray-400">Sender ID:</span> <!-- CHANGED -->
                              <span id="trackSender" class="text-white eng-font"></span>
                         </div>
                         <div class="flex justify-between">
@@ -687,8 +703,8 @@
                 <span class="lang-en hidden">We are Closed!</span>
             </h2>
             <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-                <span class="lang-bn">আমাদের সেবা প্রতিদিন <span class="text-emerald-400 font-bold">সকাল ৮টা</span> থেকে <span class="text-emerald-400 font-bold">রাত ১২টা</span> পর্যন্ত চালু থাকে।<br>দয়া করে নির্দিষ্ট সময়ে চেষ্টা করুন।</span>
-                <span class="lang-en hidden">Our service is available daily from <span class="text-emerald-400 font-bold">8 AM</span> to <span class="text-emerald-400 font-bold">12 AM</span>.<br>Please try again during working hours.</span>
+                <span class="lang-bn">আমাদের সেবা প্রতিদিন <span class="text-emerald-400 font-bold">সকাল ৮টা</span> থেকে <span class="text-emerald-400 font-bold">রাত ৮টা</span> পর্যন্ত চালু থাকে।<br>দয়া করে নির্দিষ্ট সময়ে চেষ্টা করুন।</span>
+                <span class="lang-en hidden">Our service is available daily from <span class="text-emerald-400 font-bold">8 AM</span> to <span class="text-emerald-400 font-bold">8 PM</span>.<br>Please try again during working hours.</span>
             </p>
             <button onclick="document.getElementById('timePopup').classList.add('hidden')" class="bg-white/10 hover:bg-white/20 text-white w-full py-3 rounded-xl font-bold transition-colors">
                 <span class="lang-bn">ঠিক আছে</span>
@@ -733,15 +749,15 @@
                         <div>
                             <h3 class="text-lg font-bold text-white mb-2">৩. সেবার সীমাবদ্ধতা ও জুরিসডিকশন</h3>
                             <ul class="list-disc pl-5 space-y-1 text-gray-400">
-                                <li>আমরা জুয়া (Gambling/Betting), ফরেক্স বা ক্রিপ্টো ট্রেডিংয়ের জন্য কোনো লেনদেন সমর্থন করি না।</li>
-                                <li>যেকোনো বিরোধের ক্ষেত্রে গোদাগাড়ী, রাজশাহী আদালতের এখতিয়ার প্রযোজ্য হবে।</li>
-                                <li>ফোর্স মেজার (Force Majeure): সার্ভার ডাউন, সরকারি বিধিনিষেধ বা প্রাকৃতিক দুর্যোগের কারণে সেবা ব্যাহত হলে কর্তৃপক্ষ দায়ী থাকবে না।</li>
+                                <li>We strictly prohibit transactions for Online Gambling, Betting, or illegal Forex trading.</li>
+                                <li>Any legal disputes shall be subject to the jurisdiction of the Godagari, Rajshahi Court.</li>
+                                <li><strong>Force Majeure:</strong> We are not liable for service interruptions caused by server failures, government restrictions, or natural disasters.</li>
                             </ul>
                         </div>
 
                         <div class="mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
-                            <p class="font-bold">অফিসিয়াল ঠিকানা:</p>
-                            <p>বড়দমা বাজার, গোদাগাড়ী, রাজশাহী, বাংলাদেশ।</p>
+                            <p class="font-bold">Official Address:</p>
+                            <p>Baradma Bazar, Godagari, Rajshahi, Bangladesh.</p>
                             <p>Helpline: support@moneyexchangerbd.com</p>
                         </div>
                     </div>
@@ -794,15 +810,7 @@
     <!-- MAIN LOGIC -->
     <script>
         // --- 1. CONFIG & VALIDATION DATA ---
-        // GLOBAL SOUND LISTENER FOR ALL BUTTONS
-        document.addEventListener('click', function(e) {
-            // Check if the clicked element or its parent is a button
-            const btn = e.target.closest('button');
-            if (btn) {
-                CLICK_SOUND.currentTime = 0; // Reset sound to start
-                CLICK_SOUND.play().catch(err => console.log('Audio play blocked:', err));
-            }
-        });
+        // ❌ SOUND LISTENER REMOVED
 
         const bdtSenderPrivacyPattern = /^[0-9]{4}$/; 
         const cryptoSenderPrivacyPattern = /^[0-9]{4,6}$/; 
@@ -825,7 +833,7 @@
             },
             { 
                 id: 'upay', name: 'Upay', type: 'bdt', bgClass: 'from-yellow-500 to-yellow-700', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^UG[A-Z0-9]{12,14}$/, trxHint: "Starts with UG...", receiverPattern: bdtReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/ihEz3fNdT5fFzUr0ThhdT_6b5MPPTImKwoUDAujHrn37KDEDAqq-xGnxwFIGI9cbvOE=w240-h480-rw"
             },
             { 
@@ -863,70 +871,24 @@
         let isShopOpen = true;
 
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Check Language Storage
-            const savedLang = localStorage.getItem('siteLang') || 'bn';
-            applyGlobalLanguage(savedLang);
-
-            // 2. Initialize Logic
             updateShopStatus(); 
-
-            // ✅ AUTO-FILL DATE
             const now = new Date();
-            const dateStr = now.toISOString().split('T')[0];
-            document.getElementById('userDate').value = dateStr;
-
-            // ✅ AUTO-FILL TIME (Split 12h)
-            let hours = now.getHours();
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
-            
-            document.getElementById('userHour').value = hours;
-            document.getElementById('userMin').value = minutes;
-            document.getElementById('userAmPm').value = ampm;
-
-            document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt;
-            document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
-
-            // Initialize Dropdowns
-            renderDropdown('sendMethod', 'sendOptions', 'sendSelectedDisplay', false);
-            renderDropdown('receiveMethod', 'receiveOptions', 'receiveSelectedDisplay', true);
-            
-            const receiveSelect = document.getElementById('receiveMethod');
-            receiveSelect.value = 'binance';
-            renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
-
-            generateStaticTicker(); 
-            updateUI(); 
-
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.relative')) {
-                    document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show'));
-                }
-            });
+            document.getElementById('userDate').value = now.toISOString().split('T')[0];
+            let h = now.getHours(), m = now.getMinutes().toString().padStart(2, '0'), ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12; h = h ? h : 12;
+            document.getElementById('userHour').value = h; document.getElementById('userMin').value = m; document.getElementById('userAmPm').value = ampm;
+            document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt; document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
+            renderDropdown('sendMethod', 'sendOptions', 'sendSelectedDisplay', false); renderDropdown('receiveMethod', 'receiveOptions', 'receiveSelectedDisplay', true);
+            const receiveSelect = document.getElementById('receiveMethod'); receiveSelect.value = 'binance'; renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
+            generateStaticTicker(); updateUI();
+            document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); });
         });
 
-        // --- NEW: TRACKING LOGIC ---
+        // --- NEW: TRACKING LOGIC (Using Action: "read") ---
         function toggleTrackingModal(show) {
             const modal = document.getElementById('trackingModal');
-            const resultBox = document.getElementById('trackResult');
-            const loading = document.getElementById('trackLoading');
-            const btnSpinner = document.getElementById('btnSpinner');
-            const input = document.getElementById('trackTrxInput');
-            
-            if(show) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                // Reset state
-                input.value = "";
-                resultBox.classList.add('hidden');
-                loading.classList.add('hidden');
-                btnSpinner.classList.add('hidden');
-            }
+            if(show) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            else { modal.classList.add('hidden'); modal.classList.remove('flex'); document.getElementById('trackTrxInput').value = ""; document.getElementById('trackResult').classList.add('hidden'); document.getElementById('trackLoading').classList.add('hidden'); document.getElementById('btnSpinner').classList.add('hidden'); }
         }
 
         function trackOrder() {
@@ -939,12 +901,10 @@
             const resultBox = document.getElementById('trackResult');
             const loading = document.getElementById('trackLoading');
             const btnSpinner = document.getElementById('btnSpinner');
-            const badge = document.getElementById('trackStatusBadge');
-            const reasonBox = document.getElementById('trackReasonBox');
             
             // UI Reset
             resultBox.classList.add('hidden');
-            reasonBox.classList.add('hidden');
+            document.getElementById('trackReasonBox').classList.add('hidden');
             
             // Show Spinner on button & center
             loading.classList.remove('hidden');
@@ -965,9 +925,12 @@
         }
         
         function fetchOrderData(trxId, isBackground) {
+            // ✅ CHANGED: using action="read" to fetch all data since backend has no search
             const params = {
                 method: "POST",
-                body: JSON.stringify({ action: "search", trxId: trxId })
+                body: JSON.stringify({ action: "read" }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                redirect: 'follow'
             };
             
             fetch(GOOGLE_SCRIPT_URL, params)
@@ -978,9 +941,24 @@
                     document.getElementById('btnSpinner').classList.add('hidden');
                 }
                 
-                if(data.result === "found") {
-                    renderTrackResult(data);
-                    updateLocalHistory(trxId, data);
+                // Data is an array of objects. We need to find the one matching trxId
+                let foundItem = null;
+                if (Array.isArray(data)) {
+                    foundItem = data.find(item => item.trxId && item.trxId.toString().toUpperCase() === trxId);
+                }
+                
+                if(foundItem) {
+                    // Normalize data structure for render function
+                    // Backend returns: amountReceived (In), amountSent (Out)
+                    const formattedData = {
+                        ...foundItem,
+                        amountIn: foundItem.amountReceived, 
+                        amountOut: foundItem.amountSent,
+                        time: foundItem.timestamp
+                    };
+                    
+                    renderTrackResult(formattedData);
+                    updateLocalHistory(trxId, formattedData);
                 } else if (!isBackground) {
                     showToast("Order not found!", "error");
                     document.getElementById('trackResult').classList.add('hidden');
@@ -1004,18 +982,29 @@
             resultBox.classList.remove('hidden');
 
             // Populate Data - IMPROVED TIME DISPLAY
-            // If data.time has format YYYY-MM-DD HH:MM AM/PM
             let displayTime = data.time || "N/A";
-            // If it's a combined timestamp like "2023-10-10 10:30 PM", we ensure spacing
-            // Actually, backend saves: `${userDate} ${formattedTime}` which is "YYYY-MM-DD HH:MM AM/PM"
-            // This already has a space.
+            
+            // Check if it's an ISO string (contains T and Z) or just raw
+            if(displayTime.includes('T') && displayTime.includes('Z')) {
+               try {
+                  const d = new Date(displayTime);
+                  // Format to YYYY-MM-DD HH:MM AM/PM
+                  const datePart = d.toISOString().split('T')[0];
+                  let h = d.getHours();
+                  let m = d.getMinutes().toString().padStart(2, '0');
+                  let ampm = h >= 12 ? 'PM' : 'AM';
+                  h = h % 12;
+                  h = h ? h : 12; // 0 should be 12
+                  displayTime = `${datePart} ${h}:${m} ${ampm}`;
+               } catch(e) {}
+            }
             
             document.getElementById('trackTime').innerText = displayTime;
             document.getElementById('trackTrxIdDisplay').innerText = data.trxId || document.getElementById('trackTrxInput').value.toUpperCase();
             document.getElementById('trackAmountIn').innerText = data.amountIn || "N/A";
             document.getElementById('trackAmountOut').innerText = data.amountOut || "N/A";
             
-            // Handle Sender Row - Try to show if available
+            // Handle Sender Row
             const senderRow = document.getElementById('trackSenderRow');
             if(data.userIdentifier) {
                  document.getElementById('trackSender').innerText = data.userIdentifier;
@@ -1077,6 +1066,8 @@
             const lang = localStorage.getItem('siteLang') || 'bn';
             
             // Updated logic for late night closing (e.g. 24 means 12 AM next day which is 00:00)
+            // If closing hour is 24, we treat it as end of day.
+            // Simple logic: if hour >= 8 AND hour < 24. This covers 08:00 to 23:59.
             if (hour >= CONFIG.openingHour && hour < CONFIG.closingHour) {
                 isShopOpen = true;
                 const badgeText = (lang === 'en') ? 'Online' : 'অনলাইন';
@@ -1089,8 +1080,8 @@
                 statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> ${badgeText}`;
                 statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
                 const noticeMsg = (lang === 'en') 
-                    ? "Sorry! We are currently Offline. Please try between 8 AM to 12 AM."
-                    : "দুঃখিত! এখন আমরা অফলাইন। সকাল ৮টা থেকে রাত ১২টা পর্যন্ত চেষ্টা করুন।";
+                    ? "Sorry! We are currently Offline. Please try between 8 AM to 8 PM."
+                    : "দুঃখিত! এখন আমরা অফলাইন। সকাল ৮টা থেকে রাত ৮টা পর্যন্ত চেষ্টা করুন।";
                 noticeText.innerText = noticeMsg;
                 document.getElementById('timePopup').classList.remove('hidden');
                 document.getElementById('timePopup').classList.add('flex');
@@ -1122,7 +1113,7 @@
                 bnEls.forEach(el => el.classList.remove('hidden'));
                 enEls.forEach(el => el.classList.add('hidden'));
                 if(contentBn) contentBn.classList.remove('hidden');
-                if(contentEn) contentEn.classList.add('hidden');
+                if(contentEn) contentEn.classList.remove('hidden');
                 document.documentElement.lang = "bn";
             }
         }
@@ -1265,11 +1256,15 @@
                 receiverInput.placeholder = "01xxxxxxxxx";
                 receiverInput.setAttribute('inputmode', 'numeric');
                 receiverHint.innerText = (lang === 'en') ? `Caution: Provide correct ${receiveObj.name} number.` : `সতর্কতা: সঠিক ${receiveObj.name} নাম্বার দিন।`;
+                // ✅ SET MAXLENGTH IF BDT
+                receiverInput.setAttribute('maxlength', '11');
             } else {
                 receiverLabel.innerText = (lang === 'en') ? `Receiver ${receiveObj.name} ID` : `যে ${receiveObj.name} আইডিতে ডলার নিবেন`;
                 receiverInput.placeholder = (lang === 'en') ? `Enter ${receiveObj.label}...` : `${receiveObj.label} দিন...`;
                 receiverInput.setAttribute('inputmode', 'text');
                 receiverHint.innerText = (lang === 'en') ? `Caution: Correct ${receiveObj.name} ${receiveObj.label} only.` : `সতর্কতা: সঠিক ${receiveObj.name} ${receiveObj.label} দিন।`;
+                // ✅ REMOVE MAXLENGTH IF CRYPTO
+                receiverInput.removeAttribute('maxlength');
             }
 
             document.getElementById('adminMethodName').innerText = sendObj.name;
@@ -1377,7 +1372,7 @@
                 }
             } else { isValid = false; }
 
-            // 5. Date & Time Validation
+            // 5. Date & Time Validation (NEW)
             if (!userDate || !userHour || !userMin) {
                 isValid = false;
             }
@@ -1502,9 +1497,7 @@
             document.getElementById('warningText').innerText = msg;
         }
 
-        function playSound() {
-            CLICK_SOUND.play().catch(e => console.log("Audio play failed:", e));
-        }
+        // ❌ PlaySound Function Removed
 
         function processOrder() {
             if(!isShopOpen) {
@@ -1516,8 +1509,7 @@
             const btn = document.getElementById('submitBtn');
             if(btn.disabled) return;
 
-            // ✅ 1. PLAY SOUND
-            playSound();
+            // ❌ Removed Sound Call
 
             // ✅ 2. FIRE CONFETTI
             fireConfetti();
@@ -1530,10 +1522,10 @@
             const userDate = document.getElementById('userDate').value;
             
             // Get Time Inputs
-            const userHour = document.getElementById('userHour').value;
-            const userMin = document.getElementById('userMin').value;
-            const userAmPm = document.getElementById('userAmPm').value;
-            const formattedTime = `${userHour}:${userMin} ${userAmPm}`;
+            let h = document.getElementById('userHour').value.toString().padStart(2, '0');
+            let m = document.getElementById('userMin').value.toString().padStart(2, '0');
+            let ap = document.getElementById('userAmPm').value;
+            const formattedTime = `${h}:${m} ${ap}`;
             
             const sendId = document.getElementById('sendMethod').value;
             const receiveId = document.getElementById('receiveMethod').value;
@@ -1542,7 +1534,7 @@
 
             const result = calculateValues(sendAmount, sendObj, receiveObj);
 
-            // ✅ 3. PREPARE DATA
+            // ✅ 3. SEND TO SHEET (IMMEDIATELY)
             const sheetData = {
                 platform: `${sendObj.name} To ${receiveObj.name}`,
                 type: sendObj.type,
@@ -1552,31 +1544,11 @@
                 amountSent: `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`,
                 receiverDetails: `'${receiverDetails}`, // NEW COLUMN
                 contact: `'${userWhatsapp}`, // NOW FOR WHATSAPP
-                timestamp: `${userDate} ${formattedTime}`,
+                timestamp: `${userDate} | ${formattedTime}`, // SEPARATED WITH PIPE
                 rawDate: userDate,
                 action: "create" // ✅ স্পেশাল সিগন্যাল স্ক্রিপ্টের জন্য
             };
-            
-            // ✅ 4. LOCAL STORAGE CACHE FOR INSTANT SEARCH
-            // Store transaction data locally so user can search it immediately even before server sync
-            const localHistory = JSON.parse(localStorage.getItem('tifor_trx_history') || '[]');
-            // Create a local representation of the order status
-            const localOrder = {
-                trxId: userTrxID,
-                status: 'Pending',
-                reason: '',
-                time: formattedTime,
-                amountIn: sheetData.amountReceived,
-                amountOut: sheetData.amountSent,
-                userIdentifier: userNumber,
-                timestamp: Date.now() // Add timestamp for expiry if needed later
-            };
-            // Add to history (keep last 20)
-            localHistory.unshift(localOrder);
-            if (localHistory.length > 20) localHistory.pop();
-            localStorage.setItem('tifor_trx_history', JSON.stringify(localHistory));
 
-            // ✅ 5. SEND TO SHEET (IMMEDIATELY)
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -1584,23 +1556,14 @@
                 body: JSON.stringify(sheetData)
             }).catch(err => console.error("Sheet Error:", err));
 
-            // ✅ 6. OPEN WHATSAPP (WITH TINY DELAY FOR SOUND/VISUALS)
+            // ✅ 4. OPEN WHATSAPP (WITH TINY DELAY FOR SOUND/VISUALS)
             setTimeout(() => {
                 const message = `
-*🚀 NEW ORDER (Money Exchanger BD)*
+*🚀 NEW ORDER PLACED!*
 ------------------
-🔄 *Exchange:* ${sendObj.name} ➡️ ${receiveObj.name}
-------------------
-💸 *Send:* ${sendAmount} ${sendObj.type.toUpperCase()}
-💰 *Get:* ${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}
-------------------
-👤 *Sender (End):* ${userNumber}
-🔢 *TrxID:* ${userTrxID}
-📅 *Date:* ${userDate}
-⏰ *Time:* ${formattedTime}
-------------------
-📥 *Receiver:* ${receiverDetails}
-📞 *Contact:* ${userWhatsapp}
+Check Admin Panel for Details.
+TrxID: ${userTrxID}
+Amount: ${sendAmount}
 ------------------
 ✅ *Status: PENDING*
                 `.trim();
@@ -1608,7 +1571,7 @@
                 const whatsappUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
 
-                // ✅ 7. RESET FORM
+                // ✅ 5. RESET FORM
                 document.getElementById('sendAmount').value = '';
                 document.getElementById('userNumber').value = '';
                 document.getElementById('userTrxID').value = '';
