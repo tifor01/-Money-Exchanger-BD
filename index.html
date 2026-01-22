@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Money Exchanger BD</title>
     
-    <!-- PRECONNECT FOR FASTER LOADING -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +32,8 @@
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 6s ease-in-out infinite',
                         'blob': 'blob 7s infinite',
+                        'modal-pop': 'modalPop 0.3s ease-out forwards',
+                        'spin-fast': 'spin 1s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -44,6 +45,10 @@
                             '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        modalPop: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
                         }
                     }
                 }
@@ -63,7 +68,6 @@
         }
         .eng-font { font-family: 'Inter', sans-serif; }
         
-        /* Ultra Modern Glassmorphism */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -76,7 +80,8 @@
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(4px);
-            transition: all 0.2s ease-out; /* Faster transition */
+            transition: all 0.2s ease-out; 
+            color-scheme: dark; 
         }
         .glass-input:focus {
             background: rgba(0, 0, 0, 0.5);
@@ -84,14 +89,13 @@
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
         }
 
-        /* Custom Dropdown Styling */
         .custom-select-btn {
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
             cursor: pointer;
-            -webkit-user-select: none; /* Mobile optimization */
+            -webkit-user-select: none;
             user-select: none;
         }
         .custom-options {
@@ -103,17 +107,16 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0.75rem;
             margin-top: 0.5rem;
-            max-height: 300px; /* More visible area on mobile */
+            max-height: 300px;
             overflow-y: auto;
             z-index: 50;
             display: none;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            /* Mobile scroll fix */
             -webkit-overflow-scrolling: touch;
         }
         .custom-options.show { display: block; animation: fadeIn 0.15s ease-out; }
         .custom-option {
-            padding: 12px 15px; /* Larger touch target for mobile */
+            padding: 12px 15px; 
             display: flex;
             align-items: center;
             gap: 10px;
@@ -134,7 +137,6 @@
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
         }
 
-        /* Animated Background Gradients - Hardware Accelerated */
         .aurora-bg {
             position: fixed;
             top: 0;
@@ -144,42 +146,53 @@
             z-index: -1;
             background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
             overflow: hidden;
-            will-change: transform; /* Performance Boost */
+            will-change: transform; 
         }
         .blob {
             position: absolute;
             filter: blur(80px);
             opacity: 0.4;
             animation: blob 10s infinite alternate;
-            will-change: transform; /* Performance Boost */
+            will-change: transform; 
         }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #4f46e5; animation-delay: 0s; }
         .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #10b981; animation-delay: 2s; }
         .blob-3 { bottom: 20%; left: 20%; width: 400px; height: 400px; background: #f59e0b; animation-delay: 4s; }
 
-        /* Ticker Animation - Optimized */
         .ticker-container { height: 300px; overflow: hidden; position: relative; }
-        .ticker-track { 
-            animation: scrollUp 20s linear infinite; 
-            will-change: transform; /* Performance Boost */
-        }
+        .ticker-track { animation: scrollUp 20s linear infinite; will-change: transform; }
         @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        /* Disable hover pause on mobile to prevent stuck UI */
-        @media (hover: hover) {
-            .ticker-container:hover .ticker-track { animation-play-state: paused; }
-        }
+        @media (hover: hover) { .ticker-container:hover .ticker-track { animation-play-state: paused; } }
 
-        /* QR Scan Animation */
         .qr-scanner-line { animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
 
-        /* Popup Modal */
-        #timePopup { backdrop-filter: blur(8px); }
+        #timePopup, #privacyModal, #trackingModal { backdrop-filter: blur(8px); }
+        .time-wrapper { position: relative; }
+        .time-overlay-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        /* Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #10B981;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin-fast 1s linear infinite;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col font-bangla relative selection:bg-emerald-500 selection:text-white">
 
-    <!-- Aurora Background -->
     <div class="aurora-bg">
         <div class="blob blob-1 rounded-full"></div>
         <div class="blob blob-2 rounded-full"></div>
@@ -188,36 +201,43 @@
 
     <!-- CONFIG Section -->
     <script>
+        // ✅ ফারিদের লিংক (Direct String)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7Qarj0lbq4s32rGnsPGWHUR73rIy1jD54ccNLbrLq1n-_h2XRyxGrK1t0bfb8-9klDw/exec";
+
         const CONFIG = {
-            whatsappNumber: "8801754838532", 
-            openingHour: 5,  // 5 AM
-            closingHour: 22, // 10 PM
+            whatsappNumber: "8801309559570",
+            openingHour: 8,  // সকাল ৮টা
+            closingHour: 24, // রাত ১২টা (24:00)
+            
             maxBDTValue: 500,
 
             reserve: {
-                bdt: "1,50,000+",
-                usdt: "2,400+"
+                bdt: "9812+",
+                usdt: "98+"
             },
-
             defaultFeePercentage: 3, 
             cashoutRates: { bkash: 1.85, nagad: 1.25, rocket: 1.8, upay: 1.4, tallykhata: 1.5 },
             officialExtraPercentage: 3, 
-
             rates: { usdToBdt: 118.50, bdtToUsd: 125.00 },
 
             accounts: {
-                bkash: "01318721937", 
-                nagad: "018XXXXXXXX",
-                rocket: "019XXXXXXXX",
-                upay: "016XXXXXXXX",
+                bkash: "01309559570", 
+                nagad: "01309559570",
+                upay: "01309559570",
+                rocket: "01309559570",
                 tallykhata: "01309559570",
-                binance: "123456789", 
-                bitget: "987654321",
-                mexc: "456123789",
-                redotpay: "1589529007"
+                redotpay: "1589529007",
+                bitget: "7487995164",
+                binance: "add letter", 
+                mexc: "add letter"
             },
-            notice: "🌐 আমাদের সার্ভিস সকাল ৫টা থেকে রাত ১০টা পর্যন্ত চালু থাকে। বিশ্বের সবচেয়ে দ্রুততম এক্সচেঞ্জ সার্ভিস।",
+            notice: {
+                bn: "🌐 আমাদের সার্ভিস সকাল ৮টা থেকে রাত ১২টা পর্যন্ত চালু থাকে। বিশ্বের সবচেয়ে দ্রুততম এক্সচেঞ্জ সার্ভিস।",
+                en: "🌐 Our service is available from 8 AM to 12 AM. The world's fastest exchange service."
+            }
         };
+
+        const CLICK_SOUND = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"); 
     </script>
 
     <!-- Header -->
@@ -229,19 +249,30 @@
                 </div>
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold tracking-wide text-white">
-                        Money<span class="text-emerald-400">Exchanger</span> BD
+                        Money <span class="text-emerald-400">Exchanger</span> BD
                     </h1>
                     <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest font-bold">Fast & Secure</p>
                 </div>
             </div>
-            <div id="statusBadge" class="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-gray-500"></span> চেকিং...
+            
+            <div class="flex items-center gap-2">
+                <!-- ✅ TRACK ORDER BUTTON -->
+                <button onclick="toggleTrackingModal(true)" class="w-8 h-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition-all group mr-2 shadow-[0_0_10px_rgba(16,185,129,0.2)]" title="Track Order">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
+
+                <button onclick="toggleGlobalLanguage()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group mr-2" title="Change Language">
+                    <i class="fa-solid fa-earth-americas text-emerald-400 group-hover:rotate-180 transition-transform duration-500"></i>
+                </button>
+
+                <div id="statusBadge" class="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner">
+                </div>
             </div>
         </div>
         <div class="bg-gradient-to-r from-emerald-900/40 via-black/40 to-emerald-900/40 text-emerald-100 text-xs py-1 border-y border-white/5 backdrop-blur-sm">
             <div class="container mx-auto flex items-center gap-2 px-4">
                 <span class="bg-red-500 text-white px-2 rounded text-[10px] font-bold animate-pulse">LIVE</span>
-                <marquee behavior="scroll" direction="left" id="noticeText">নোটিশ লোড হচ্ছে...</marquee>
+                <marquee behavior="scroll" direction="left" id="noticeText">Loading...</marquee>
             </div>
         </div>
     </header>
@@ -253,38 +284,36 @@
             <!-- LEFT: Calculator -->
             <div class="lg:col-span-2 space-y-6">
                 <div id="calculatorCard" class="glass-panel rounded-2xl p-1 shadow-2xl relative transition-all duration-500 group">
-                    <!-- Gradient Border Effect -->
                     <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-purple-500/20 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
                     
                     <div class="relative bg-slate-900/80 rounded-xl p-6 backdrop-blur-xl">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-2xl font-bold flex items-center gap-2 text-white">
-                                <i class="fa-solid fa-arrow-right-arrow-left text-emerald-400"></i> এক্সচেঞ্জ জোন
+                                <i class="fa-solid fa-arrow-right-arrow-left text-emerald-400"></i> 
+                                <span class="lang-bn">এক্সচেঞ্জ জোন</span>
+                                <span class="lang-en hidden eng-font">Exchange Zone</span>
                             </h2>
                             <span class="text-xs text-gray-400 border border-white/10 px-2 py-1 rounded bg-white/5">
                                 <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure P2P
                             </span>
                         </div>
 
-                        <!-- Selection Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
                             <!-- Send -->
                             <div class="space-y-4">
-                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">সেন্ড করবেন (Send)</label>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
+                                    <span class="lang-bn">সেন্ড করবেন (Send)</span>
+                                    <span class="lang-en hidden">You Send</span>
+                                </label>
                                 
-                                <!-- Custom Dropdown for SEND -->
                                 <div class="relative" id="sendDropdownContainer">
-                                    <select id="sendMethod" class="hidden" onchange="updateUI()"></select> <!-- Hidden Native Select -->
+                                    <select id="sendMethod" class="hidden" onchange="updateUI()"></select> 
                                     
                                     <div class="glass-input text-white rounded-xl p-3 custom-select-btn touch-manipulation" onclick="toggleDropdown('sendOptions')">
-                                        <div class="flex items-center gap-3" id="sendSelectedDisplay">
-                                            <!-- JS will fill this -->
-                                        </div>
+                                        <div class="flex items-center gap-3" id="sendSelectedDisplay"></div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                                     </div>
-                                    <div id="sendOptions" class="custom-options glass-panel">
-                                        <!-- JS will fill options -->
-                                    </div>
+                                    <div id="sendOptions" class="custom-options glass-panel"></div>
                                 </div>
 
                                 <div class="relative group mt-2">
@@ -294,7 +323,7 @@
                                 <p class="text-[10px] text-gray-400 text-right pr-1" id="minAmountHint">Loading...</p>
                             </div>
 
-                            <!-- Swap Icon (Floating) -->
+                            <!-- Swap Icon -->
                             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[80%] md:-translate-y-1/2 z-20 cursor-pointer" onclick="swapMethods()" title="Swap">
                                 <div class="bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center border border-white/10 shadow-xl shadow-black/50 hover:scale-110 hover:border-emerald-500/50 hover:shadow-emerald-500/20 transition-all duration-300">
                                     <i class="fa-solid fa-shuffle text-white text-lg group-hover:animate-spin"></i>
@@ -303,25 +332,26 @@
 
                             <!-- Receive -->
                             <div class="space-y-4 mt-6 md:mt-0">
-                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">রিসিভ করবেন (Receive)</label>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
+                                    <span class="lang-bn">রিসিভ করবেন (Receive)</span>
+                                    <span class="lang-en hidden">You Receive</span>
+                                </label>
                                 
-                                <!-- Custom Dropdown for RECEIVE -->
                                 <div class="relative" id="receiveDropdownContainer">
-                                    <select id="receiveMethod" class="hidden" onchange="updateUI()"></select> <!-- Hidden Native Select -->
+                                    <select id="receiveMethod" class="hidden" onchange="updateUI()"></select>
                                     
                                     <div class="glass-input text-white rounded-xl p-3 custom-select-btn touch-manipulation" onclick="toggleDropdown('receiveOptions')">
-                                        <div class="flex items-center gap-3" id="receiveSelectedDisplay">
-                                            <!-- JS will fill this -->
-                                        </div>
+                                        <div class="flex items-center gap-3" id="receiveSelectedDisplay"></div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                                     </div>
-                                    <div id="receiveOptions" class="custom-options glass-panel">
-                                        <!-- JS will fill options -->
-                                    </div>
+                                    <div id="receiveOptions" class="custom-options glass-panel"></div>
                                 </div>
 
                                 <div class="glass-input rounded-xl px-4 py-4 flex flex-col justify-center min-h-[76px] mt-2">
-                                    <span class="text-[10px] text-gray-400 mb-1">পাবেন (Net Amount):</span>
+                                    <span class="text-[10px] text-gray-400 mb-1">
+                                        <span class="lang-bn">পাবেন (Net Amount):</span>
+                                        <span class="lang-en hidden">You Get (Net):</span>
+                                    </span>
                                     <div class="flex justify-between items-end">
                                         <span id="receiveAmount" class="text-2xl font-bold text-white eng-font drop-shadow-md">0.00</span>
                                         <span id="receiveCurrency" class="text-xs font-bold text-emerald-400 eng-font bg-emerald-400/10 px-2 py-1 rounded">USD</span>
@@ -334,7 +364,10 @@
                         <div id="calcBreakdown" class="mt-6 bg-white/5 rounded-xl p-4 border border-white/5 text-sm space-y-3 hidden relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                             <div class="flex justify-between items-center relative z-10">
-                                <span class="text-gray-400">এক্সচেঞ্জ রেট:</span>
+                                <span class="text-gray-400">
+                                    <span class="lang-bn">এক্সচেঞ্জ রেট:</span>
+                                    <span class="lang-en hidden">Exchange Rate:</span>
+                                </span>
                                 <span id="rateDisplay" class="text-white font-medium eng-font bg-black/20 px-2 py-0.5 rounded">-</span>
                             </div>
                             <div class="flex justify-between items-center text-red-300 font-medium relative z-10">
@@ -342,7 +375,10 @@
                                 <span id="feeDisplay" class="eng-font">- 0.00</span>
                             </div>
                             <div class="border-t border-white/10 pt-2 flex justify-between text-white font-bold text-lg relative z-10">
-                                <span>মোট পাবেন:</span>
+                                <span>
+                                    <span class="lang-bn">মোট পাবেন:</span>
+                                    <span class="lang-en hidden">Total Receive:</span>
+                                </span>
                                 <span id="finalReceiveDisplay" class="eng-font text-emerald-400">0.00</span>
                             </div>
                         </div>
@@ -355,7 +391,9 @@
                         <div class="mt-6">
                             <div class="glass-input p-4 rounded-xl relative overflow-hidden">
                                 <h3 class="text-white font-bold mb-3 flex items-center gap-2 text-sm">
-                                    <i class="fa-solid fa-paper-plane text-blue-400"></i> পেমেন্ট পাঠান এখানে
+                                    <i class="fa-solid fa-paper-plane text-blue-400"></i> 
+                                    <span class="lang-bn">পেমেন্ট পাঠান এখানে</span>
+                                    <span class="lang-en hidden">Send Payment Here</span>
                                 </h3>
                                 
                                 <div class="flex flex-col md:flex-row gap-4 items-center">
@@ -377,15 +415,27 @@
                             </div>
                         </div>
 
+                        <!-- Large Send Amount Display -->
+                        <div id="dynamicSendPreview" class="mt-6 bg-emerald-600 border border-emerald-400 rounded-xl p-6 text-center hidden animate-pulse transition-all shadow-lg shadow-emerald-500/20">
+                            <p class="text-xs text-emerald-100 mb-1 font-bold uppercase tracking-widest">
+                                <span class="lang-bn">মোট টাকা পাঠাতে হবে (Send Amount)</span>
+                                <span class="lang-en hidden">Total Send Amount</span>
+                            </p>
+                            <h2 class="text-5xl font-bold text-white eng-font drop-shadow-md" id="displaySendAmount">0.00</h2>
+                        </div>
+
                         <!-- User Inputs -->
                         <div class="mt-6 space-y-5">
-                            <h3 class="text-gray-300 font-semibold text-sm border-l-2 border-emerald-500 pl-3">আপনার তথ্য দিন</h3>
+                            <h3 class="text-gray-300 font-semibold text-sm border-l-2 border-emerald-500 pl-3">
+                                <span class="lang-bn">আপনার তথ্য দিন</span>
+                                <span class="lang-en hidden">Your Information</span>
+                            </h3>
                             
                             <!-- Sender & TrxID -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label id="senderLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">সেন্ডার নাম্বার</label>
-                                    <input type="text" id="userNumber" placeholder="xxxx" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                    <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
                                     <p id="senderError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
                                 <div class="relative">
@@ -393,6 +443,38 @@
                                     <input type="text" id="userTrxID" placeholder="TrxID Here..." class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all uppercase" oninput="validateForm()">
                                     <p id="trxError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
+                            </div>
+
+                            <!-- ✅ DATE & TIME INPUT (Manual Keyboard & AM/PM Select) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="relative">
+                                    <label class="block text-gray-400 text-xs mb-1.5 ml-1">তারিখ (Date)</label>
+                                    <input type="date" id="userDate" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                </div>
+                                <div class="relative">
+                                    <label class="block text-gray-400 text-xs mb-1.5 ml-1">সময় (Time)</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="userHour" placeholder="HH" min="1" max="12" inputmode="numeric" class="w-1/3 glass-input text-white text-center rounded-xl px-2 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                        <input type="number" id="userMin" placeholder="MM" min="0" max="59" inputmode="numeric" class="w-1/3 glass-input text-white text-center rounded-xl px-2 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                        <select id="userAmPm" class="w-1/3 glass-input text-white text-center rounded-xl px-1 py-3 eng-font focus:outline-none text-sm transition-all cursor-pointer bg-slate-800" onchange="validateForm()">
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
+                                    <p class="text-[10px] text-red-300 mt-1 ml-1 flex items-start gap-1 leading-tight">
+                                        <i class="fa-solid fa-info-circle text-red-400 mt-0.5"></i>
+                                        <span>সময় টাইপ করে এবং AM/PM সিলেক্ট করে দিন।</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- ✅ WHATSAPP NUMBER INPUT (FIXED VALIDATION) -->
+                            <div class="relative">
+                                <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
+                                </label>
+                                <input type="tel" id="userWhatsapp" placeholder="01xxxxxxxxx" inputmode="numeric" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
+                                <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
                             </div>
 
                             <!-- Receiver Info -->
@@ -411,20 +493,23 @@
 
                         <!-- Submit Button -->
                         <button id="submitBtn" onclick="processOrder()" disabled class="relative w-full mt-8 bg-gradient-to-r from-gray-700 to-gray-800 border border-white/10 text-gray-400 font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-all duration-300 cursor-not-allowed overflow-hidden">
-                            <span>অর্ডার কনফার্ম করুন</span>
+                            <span class="lang-bn">অর্ডার কনফার্ম করুন</span>
+                            <span class="lang-en hidden">Confirm Order</span>
                             <i class="fa-brands fa-whatsapp text-2xl"></i>
                         </button>
                     </div>
                 </div>
             </div>
             
-            <!-- RIGHT: Sidebar -->
+            <!-- RIGHT: Sidebar (Unchanged) -->
             <div class="space-y-6">
                 <!-- Reserve -->
                 <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white">
-                        <i class="fa-solid fa-vault text-emerald-400"></i> লাইভ রিজার্ভ
+                        <i class="fa-solid fa-vault text-emerald-400"></i> 
+                        <span class="lang-bn">লাইভ রিজার্ভ</span>
+                        <span class="lang-en hidden">Live Reserve</span>
                     </h3>
                     <div class="space-y-3 relative z-10">
                         <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-colors">
@@ -447,7 +532,9 @@
                 <!-- Transactions -->
                 <div class="glass-panel rounded-2xl p-5 overflow-hidden h-[400px]">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white border-b border-white/10 pb-2">
-                        <i class="fa-solid fa-chart-line text-blue-400"></i> সাম্প্রতিক লেনদেন
+                        <i class="fa-solid fa-chart-line text-blue-400"></i> 
+                        <span class="lang-bn">সাম্প্রতিক লেনদেন</span>
+                        <span class="lang-en hidden">Recent Transactions</span>
                     </h3>
                     <div class="ticker-container">
                         <div id="transactionList" class="ticker-track space-y-3"></div>
@@ -457,28 +544,53 @@
 
                 <!-- Rules -->
                 <div class="glass-panel rounded-2xl p-5">
-                    <h3 class="font-bold text-sm mb-3 text-gray-300 uppercase tracking-wider">⚠️ জরুরি নিয়মাবলী</h3>
+                    <h3 class="font-bold text-sm mb-3 text-gray-300 uppercase tracking-wider">
+                        ⚠️ <span class="lang-bn">জরুরি নিয়মাবলী</span><span class="lang-en hidden">Important Rules</span>
+                    </h3>
                     <ul class="text-xs text-gray-400 space-y-2 list-none">
-                        <li class="flex gap-2"><i class="fa-solid fa-check text-emerald-500"></i> মিনিমাম ১ টাকা, সর্বোচ্চ ৫০০ টাকা।</li>
-                        <li class="flex gap-2"><i class="fa-solid fa-check text-emerald-500"></i> TrxID অবশ্যই ইংরেজিতে লিখবেন।</li>
-                        <li class="flex gap-2"><i class="fa-solid fa-check text-emerald-500"></i> ভুল নাম্বারে টাকা পাঠালে আমরা দায়ী নই।</li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-emerald-500"></i> 
+                            <span class="lang-bn">মিনিমাম ১ টাকা, সর্বোচ্চ ৫০০ টাকা।</span>
+                            <span class="lang-en hidden">Min 1 BDT, Max 500 BDT.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-emerald-500"></i> 
+                            <span class="lang-bn">TrxID অবশ্যই ইংরেজিতে লিখবেন।</span>
+                            <span class="lang-en hidden">Write TrxID in English.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-emerald-500"></i> 
+                            <span class="lang-bn">ভুল নাম্বারে টাকা পাঠালে আমরা দায়ী নই।</span>
+                            <span class="lang-en hidden">We are not liable for wrong number transfers.</span>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Footer & Utilities (Same as before) -->
     <footer class="glass-panel border-t border-white/5 py-8 mt-8 z-10 relative">
-        <div class="container mx-auto px-4 text-center">
+        <div class="container mx-auto px-4 text-center space-y-4">
+            <div class="flex justify-center gap-4">
+                <a href="https://wa.me/8801309559570" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white flex items-center justify-center transition-all">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                </a>
+                <a href="https://t.me/mebdofficialchannel" target="_blank" class="w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white flex items-center justify-center transition-all">
+                    <i class="fa-brands fa-telegram text-xl"></i>
+                </a>
+            </div>
             <p class="text-gray-500 text-xs tracking-wider">
                 &copy; 2026 Money Exchanger BD. All Rights Reserved. <br>
-                <a href="#" class="text-emerald-500 hover:underline">Privacy Policy</a>
+                <a href="javascript:void(0)" onclick="togglePrivacy(true)" class="text-emerald-500 hover:underline">
+                    <span class="lang-bn">প্রাইভেসি পলিসি</span>
+                    <span class="lang-en hidden">Privacy Policy</span>
+                </a>
             </p>
         </div>
     </footer>
 
     <!-- Utilities -->
-    <!-- Confetti Canvas -->
     <canvas id="confetti" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
     <div id="toast" class="fixed top-24 right-5 bg-slate-900/90 border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-x-[200%] transition-transform duration-500 z-[60] backdrop-blur-xl flex items-center gap-3">
@@ -498,105 +610,282 @@
         </div>
     </div>
 
+    <!-- ✅ TRACK ORDER MODAL -->
+    <div id="trackingModal" class="fixed inset-0 z-[95] bg-black/95 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 animate-modal-pop relative">
+            <button onclick="toggleTrackingModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-emerald-400"></i>
+                <span class="lang-bn">অর্ডার ট্র্যাক করুন</span>
+                <span class="lang-en hidden">Track Order</span>
+            </h2>
+
+            <div class="space-y-4">
+                <div class="relative">
+                    <input type="text" id="trackTrxInput" placeholder="Enter your TrxID..." class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none uppercase">
+                    
+                    <!-- ✅ SPINNER ADDED HERE -->
+                    <button onclick="trackOrder()" id="trackBtn" class="absolute right-2 top-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2">
+                        <span>Check</span>
+                        <div id="btnSpinner" class="spinner hidden"></div>
+                    </button>
+                </div>
+
+                <div id="trackResult" class="hidden mt-4 space-y-3">
+                    <!-- Status Badge -->
+                    <div class="flex justify-center">
+                        <span id="trackStatusBadge" class="px-4 py-1 rounded-full text-xs font-bold uppercase"></span>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div class="bg-white/5 rounded-xl p-4 space-y-2 text-sm">
+                        <!-- Date & Time (Combined) -->
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Date/Time:</span>
+                            <span id="trackTime" class="text-white eng-font text-xs"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">TrxID:</span>
+                            <span id="trackTrxIdDisplay" class="text-white eng-font select-all"></span>
+                        </div>
+                        <!-- Sender Last Digits (If Available) -->
+                        <div class="flex justify-between" id="trackSenderRow">
+                             <span class="text-gray-400">Sender No:</span>
+                             <span id="trackSender" class="text-white eng-font"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Amount Sent:</span>
+                            <span id="trackAmountIn" class="text-white eng-font"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Amount Get:</span>
+                            <span id="trackAmountOut" class="text-white eng-font"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reason Box (Only for Cancelled) -->
+                    <div id="trackReasonBox" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
+                        <p class="text-xs text-red-300 mb-1 uppercase font-bold">Reason / কারণ</p>
+                        <p id="trackReasonText" class="text-white font-medium"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- TIME RESTRICTION POPUP MODAL -->
     <div id="timePopup" class="fixed inset-0 z-[80] bg-black/90 hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-red-500/30 p-8 rounded-3xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(239,68,68,0.3)] transform scale-100 transition-all">
             <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <i class="fa-solid fa-moon text-red-500 text-4xl"></i>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">এখন বন্ধ আছে!</h2>
+            <h2 class="text-2xl font-bold text-white mb-2">
+                <span class="lang-bn">এখন বন্ধ আছে!</span>
+                <span class="lang-en hidden">We are Closed!</span>
+            </h2>
             <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-                আমাদের সেবা প্রতিদিন <span class="text-emerald-400 font-bold">সকাল ৫টা</span> থেকে <span class="text-emerald-400 font-bold">রাত ১০টা</span> পর্যন্ত চালু থাকে।<br>দয়া করে নির্দিষ্ট সময়ে চেষ্টা করুন।
+                <span class="lang-bn">আমাদের সেবা প্রতিদিন <span class="text-emerald-400 font-bold">সকাল ৮টা</span> থেকে <span class="text-emerald-400 font-bold">রাত ১২টা</span> পর্যন্ত চালু থাকে।<br>দয়া করে নির্দিষ্ট সময়ে চেষ্টা করুন।</span>
+                <span class="lang-en hidden">Our service is available daily from <span class="text-emerald-400 font-bold">8 AM</span> to <span class="text-emerald-400 font-bold">12 AM</span>.<br>Please try again during working hours.</span>
             </p>
             <button onclick="document.getElementById('timePopup').classList.add('hidden')" class="bg-white/10 hover:bg-white/20 text-white w-full py-3 rounded-xl font-bold transition-colors">
-                ঠিক আছে
+                <span class="lang-bn">ঠিক আছে</span>
+                <span class="lang-en hidden">OK</span>
             </button>
+        </div>
+    </div>
+
+    <!-- UPDATED: IRONCLAD PRIVACY POLICY MODAL -->
+    <div id="privacyModal" class="fixed inset-0 z-[90] bg-black/95 hidden overflow-y-auto backdrop-blur-md">
+        <div class="min-h-screen px-4 py-8 flex items-center justify-center">
+            <div class="glass-panel rounded-2xl p-6 md:p-10 shadow-2xl relative w-full max-w-4xl animate-modal-pop">
+                <!-- Close Button -->
+                <button onclick="togglePrivacy(false)" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-red-500/20 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all z-20">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <!-- BANGLA CONTENT (Default) -->
+                <div id="content-bn" class="space-y-6">
+                    <h1 class="text-3xl font-bold text-emerald-400 mb-6 border-b border-white/10 pb-4">গোপনীয়তা নীতি ও আইনি দাবিত্যাগ</h1>
+                    
+                    <div class="bg-red-900/20 border border-red-500/50 p-5 rounded-xl">
+                        <h3 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-gavel"></i> গুরুত্বপূর্ণ আইনি নোটিশ
+                        </h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            Money Exchanger BD একটি স্বাধীন P2P (Peer-to-Peer) ফ্রিল্যান্সিং কারেন্সি এক্সচেঞ্জ সলিউশন। আমরা কোনো ব্যাংকিং প্রতিষ্ঠান নই। এই প্ল্যাটফর্মটি শুধুমাত্র ফ্রিল্যান্সার এবং রিমোট ওয়ার্কারদের সুবিধার্থে তৈরি করা হয়েছে।
+                        </p>
+                    </div>
+
+                    <div class="space-y-5 text-gray-300 leading-relaxed text-sm md:text-base">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">১. ফান্ডের উৎস ও দায়বদ্ধতা (Source of Funds)</h3>
+                            <p>ব্যবহারকারী নিশ্চয়তা দিচ্ছেন যে এক্সচেঞ্জকৃত অর্থ বৈধ উপায়ে উপার্জিত (ফ্রিল্যান্সিং, আউটসোর্সিং বা বৈধ আইটি সেবা)। মানি লন্ডারিং প্রতিরোধ আইন ২০১২ (Money Laundering Prevention Act, 2012) অনুযায়ী, কোনো প্রকার অবৈধ, চোরাই বা হুন্ডির টাকা লেনদেন করা দণ্ডনীয় অপরাধ। ব্যবহারকারীর কোনো অবৈধ লেনদেনের জন্য প্ল্যাটফর্ম কর্তৃপক্ষ কোনোভাবেই আইনি দায়ভার বহন করবে না।</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">২. ডিজিটাল নিরাপত্তা ও তথ্য সুরক্ষা</h3>
+                            <p>ডিজিটাল নিরাপত্তা আইন ২০১৮ (Digital Security Act, 2018) অনুযায়ী আমরা ব্যবহারকারীর তথ্য (নাম, নাম্বার, TrxID) শুধুমাত্র অর্ডার ভেরিফিকেশনের কাজে ব্যবহার করি এবং তৃতীয় পক্ষের কাছে হস্তান্তর করি না। তবে আইনশৃঙ্খলা রক্ষাকারী বাহিনীর প্রয়োজনে আমরা তথ্য প্রদানে বাধ্য থাকিব।</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">৩. সেবার সীমাবদ্ধতা ও জুরিসডিকশন</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-400">
+                                <li>আমরা জুয়া (Gambling/Betting), ফরেক্স বা ক্রিপ্টো ট্রেডিংয়ের জন্য কোনো লেনদেন সমর্থন করি না।</li>
+                                <li>যেকোনো বিরোধের ক্ষেত্রে গোদাগাড়ী, রাজশাহী আদালতের এখতিয়ার প্রযোজ্য হবে।</li>
+                                <li>ফোর্স মেজার (Force Majeure): সার্ভার ডাউন, সরকারি বিধিনিষেধ বা প্রাকৃতিক দুর্যোগের কারণে সেবা ব্যাহত হলে কর্তৃপক্ষ দায়ী থাকবে না।</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
+                            <p class="font-bold">অফিসিয়াল ঠিকানা:</p>
+                            <p>বড়দমা বাজার, গোদাগাড়ী, রাজশাহী, বাংলাদেশ।</p>
+                            <p>Helpline: support@moneyexchangerbd.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENGLISH CONTENT (Strict Legal Tone) -->
+                <div id="content-en" class="hidden space-y-6 eng-font">
+                    <h1 class="text-3xl font-bold text-emerald-400 mb-6 border-b border-white/10 pb-4">Privacy Policy & Legal Disclaimer</h1>
+                    
+                    <div class="bg-red-900/20 border border-red-500/50 p-5 rounded-xl">
+                        <h3 class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-gavel"></i> IMPORTANT LEGAL NOTICE
+                        </h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            Money Exchanger BD is an independent P2P (Peer-to-Peer) Freelancing Currency Exchange Solution. We are NOT a banking institution. This platform is designed solely for freelancers and remote workers.
+                        </p>
+                    </div>
+
+                    <div class="space-y-5 text-gray-300 leading-relaxed text-sm md:text-base">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">1. Source of Funds & Liability</h3>
+                            <p>The user warrants that all funds exchanged are earned through legitimate means (Freelancing, Outsourcing, IT Services). In compliance with the <strong>Money Laundering Prevention Act, 2012</strong>, exchanging illegal, stolen, or hundi funds is a punishable offense. The platform admins hold ZERO LIABILITY for any illicit transactions conducted by users.</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">2. Digital Security & Data Protection</h3>
+                            <p>In accordance with the <strong>Digital Security Act, 2018</strong>, user data (Name, Number, TrxID) is used strictly for order verification and is never shared with third parties, except when required by Law Enforcement Agencies.</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">3. Limitations & Jurisdiction</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-400">
+                                <li>We strictly prohibit transactions for Online Gambling, Betting, or illegal Forex trading.</li>
+                                <li>Any legal disputes shall be subject to the jurisdiction of the Godagari, Rajshahi Court.</li>
+                                <li><strong>Force Majeure:</strong> We are not liable for service interruptions caused by server failures, government restrictions, or natural disasters.</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-white/10 text-center text-xs text-gray-500">
+                            <p class="font-bold">Official Address:</p>
+                            <p>Baradma Bazar, Godagari, Rajshahi, Bangladesh.</p>
+                            <p>Helpline: support@moneyexchangerbd.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- MAIN LOGIC -->
     <script>
         // --- 1. CONFIG & VALIDATION DATA ---
+        // GLOBAL SOUND LISTENER FOR ALL BUTTONS
+        document.addEventListener('click', function(e) {
+            // Check if the clicked element or its parent is a button
+            const btn = e.target.closest('button');
+            if (btn) {
+                CLICK_SOUND.currentTime = 0; // Reset sound to start
+                CLICK_SOUND.play().catch(err => console.log('Audio play blocked:', err));
+            }
+        });
+
         const bdtSenderPrivacyPattern = /^[0-9]{4}$/; 
         const cryptoSenderPrivacyPattern = /^[0-9]{4,6}$/; 
         const bdtReceiverPattern = /^01[0-9]{9}$/; 
         const cryptoReceiverPattern = /^[0-9]{8,20}$/; 
+        
+        // ✅ UPDATED TrxID PATTERNS (Alphanumeric Support)
+        const commonTrxPattern = /^[A-Z0-9]{6,20}$/; // Broad alphanumeric support
 
-        // UPDATED Methods Array with USER PROVIDED LOGO URLs
         const methods = [
             { 
                 id: 'bkash', name: 'Bkash', type: 'bdt', bgClass: 'from-pink-600 to-pink-800', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{10,12}$/, trxHint: "10-12 Chars (Alphanumeric)", receiverPattern: bdtReceiverPattern,
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/1CRcUfmtwvWxT2g-xJF8s9_btha42TLi6Lo-qVkVomXBb_citzakZX9BbeY51iholWs"
             },
             { 
                 id: 'nagad', name: 'Nagad', type: 'bdt', bgClass: 'from-orange-600 to-orange-800', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{12,14}$/, trxHint: "12-14 Chars (Alphanumeric)", receiverPattern: bdtReceiverPattern,
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/9ps_d6nGKQzfbsJfMaFR0RkdwzEdbZV53ReYCS09Eo5MV-GtVylFD-7IHcVktlnz9Mo=w240-h480-rw"
             },
             { 
-                id: 'rocket', name: 'Rocket', type: 'bdt', bgClass: 'from-purple-600 to-purple-800', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{8,11}$/, trxHint: "8-11 Chars (Alphanumeric)", receiverPattern: bdtReceiverPattern,
-                logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8=w240-h480-rw"
-            },
-            { 
                 id: 'upay', name: 'Upay', type: 'bdt', bgClass: 'from-yellow-500 to-yellow-700', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^UG[A-Z0-9]{12,14}$/, trxHint: "Starts with UG...", receiverPattern: bdtReceiverPattern,
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/ihEz3fNdT5fFzUr0ThhdT_6b5MPPTImKwoUDAujHrn37KDEDAqq-xGnxwFIGI9cbvOE=w240-h480-rw"
             },
             { 
+                id: 'rocket', name: 'Rocket', type: 'bdt', bgClass: 'from-purple-600 to-purple-800', min: 1, max: 500, label: 'Personal', trxType: 'TrxID',
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
+                logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8=w240-h480-rw"
+            },
+            { 
                 id: 'tallykhata', name: 'TallyKhata', type: 'bdt', bgClass: 'from-red-700 to-red-900', min: 1, max: 500, label: 'Wallet', trxType: 'TrxID',
-                senderPattern: bdtSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{12,18}$/, trxHint: "12-18 Chars (Alphanumeric)", receiverPattern: bdtReceiverPattern,
+                senderPattern: bdtSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Alphanumeric TrxID", receiverPattern: bdtReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/96_mWv5NI3VsON40Wt1l5Xjw2gjy36hzbv5oRf10Vawtf9hKZjgnWqy7_i30-HqapndX=s48-rw" 
             },
             { 
-                id: 'binance', name: 'Binance', type: 'usd', bgClass: 'from-yellow-500 to-yellow-600', min: 0.01, max: 5.00, label: 'Pay ID', trxType: 'Proof/Ref',
-                senderPattern: cryptoSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{10,12}$/, trxHint: "Ref 10-12 Chars", receiverPattern: cryptoReceiverPattern,
-                logo: "https://play-lh.googleusercontent.com/T1_WHAGs5WZePQejNSqqrxZah4uhBvYr698nTCFhXMjMZo5oSCoko5yW2wtmeO1ClRU=s48-rw"
+                id: 'redotpay', name: 'RedotPay', type: 'usd', bgClass: 'from-red-600 to-red-800', min: 0.01, max: 5.00, label: 'ID', trxType: 'Order ID',
+                senderPattern: cryptoSenderPrivacyPattern, trxPattern: /^[0-9]{10,20}$/, trxHint: "Numeric Order ID", receiverPattern: cryptoReceiverPattern,
+                logo: "https://play-lh.googleusercontent.com/kvP-BmU-swM_AqJSTgCFZEc44L2qgC32LWF2xctra2Px8FkSriGv9D7aqMp5FU2u2Q=s48-rw"
             },
             { 
                 id: 'bitget', name: 'Bitget', type: 'usd', bgClass: 'from-cyan-600 to-cyan-800', min: 0.10, max: 5.00, label: 'UID', trxType: 'Order ID',
-                senderPattern: cryptoSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{10,12}$/, trxHint: "Ref 10-12 Chars", receiverPattern: cryptoReceiverPattern,
+                senderPattern: cryptoSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Ref/Order ID", receiverPattern: cryptoReceiverPattern,
                 logo: "https://play-lh.googleusercontent.com/taWX1dumJ_whqmmq0c4QZMML3FTuec43Va6wwO20Od6XkGsw6m4KnG5Bbm9Y7aNIojg=w240-h480-rw"
             },
             { 
-                id: 'mexc', name: 'Mexc', type: 'usd', bgClass: 'from-blue-600 to-blue-800', min: 0.01, max: 5.00, label: 'UID', trxType: 'TxHash',
-                senderPattern: cryptoSenderPrivacyPattern, trxPattern: /^[A-Z0-9]{10,12}$/, trxHint: "Ref 10-12 Chars", receiverPattern: cryptoReceiverPattern,
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDUUxyLCj_1lah_lgYSaDDvXqfdPZxQbY0sw&s"
+                id: 'binance', name: 'Binance', type: 'usd', bgClass: 'from-yellow-500 to-yellow-600', min: 0.01, max: 5.00, label: 'Pay ID', trxType: 'Proof/Ref',
+                senderPattern: cryptoSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Ref ID", receiverPattern: cryptoReceiverPattern,
+                logo: "https://play-lh.googleusercontent.com/T1_WHAGs5WZePQejNSqqrxZah4uhBvYr698nTCFhXMjMZo5oSCoko5yW2wtmeO1ClRU=s48-rw"
             },
             { 
-                id: 'redotpay', name: 'RedotPay', type: 'usd', bgClass: 'from-red-600 to-red-800', min: 0.01, max: 5.00, label: 'ID', trxType: 'Order ID',
-                senderPattern: cryptoSenderPrivacyPattern, trxPattern: /^[0-9]{10,12}$/, trxHint: "Numeric 10-12 Digits", receiverPattern: cryptoReceiverPattern,
-                logo: "https://play-lh.googleusercontent.com/kvP-BmU-swM_AqJSTgCFZEc44L2qgC32LWF2xctra2Px8FkSriGv9D7aqMp5FU2u2Q=s48-rw"
+                id: 'mexc', name: 'Mexc', type: 'usd', bgClass: 'from-blue-600 to-blue-800', min: 0.01, max: 5.00, label: 'UID', trxType: 'TxHash',
+                senderPattern: cryptoSenderPrivacyPattern, trxPattern: commonTrxPattern, trxHint: "Ref/TxHash", receiverPattern: cryptoReceiverPattern,
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDUUxyLCj_1lah_lgYSaDDvXqfdPZxQbY0sw&s"
             }
         ];
 
         let isShopOpen = true;
 
-        // OPTIMIZED: Use DOMContentLoaded for instant execution instead of waiting for all images
         document.addEventListener("DOMContentLoaded", function() {
-            const now = new Date();
-            const hour = now.getHours();
-            const statusBadge = document.getElementById('statusBadge');
-            
-            // Time Logic (5 AM to 10 PM)
-            if (hour >= CONFIG.openingHour && hour < CONFIG.closingHour) {
-                isShopOpen = true;
-                statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> অনলাইন';
-                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
-            } else {
-                isShopOpen = false;
-                statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> অফলাইন';
-                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
-                document.getElementById('noticeText').innerText = "দুঃখিত! এখন আমরা অফলাইন। সকাল ৫টা থেকে রাত ১০টা পর্যন্ত চেষ্টা করুন।";
-                
-                // Show Popup on Load if Closed
-                document.getElementById('timePopup').classList.remove('hidden');
-                document.getElementById('timePopup').classList.add('flex');
-            }
+            // 1. Check Language Storage
+            const savedLang = localStorage.getItem('siteLang') || 'bn';
+            applyGlobalLanguage(savedLang);
 
-            if(isShopOpen) document.getElementById('noticeText').innerText = CONFIG.notice;
+            // 2. Initialize Logic
+            updateShopStatus(); 
+
+            // ✅ AUTO-FILL DATE
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            document.getElementById('userDate').value = dateStr;
+
+            // ✅ AUTO-FILL TIME (Split 12h)
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
             
+            document.getElementById('userHour').value = hours;
+            document.getElementById('userMin').value = minutes;
+            document.getElementById('userAmPm').value = ampm;
+
             document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt;
             document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
 
@@ -604,7 +893,6 @@
             renderDropdown('sendMethod', 'sendOptions', 'sendSelectedDisplay', false);
             renderDropdown('receiveMethod', 'receiveOptions', 'receiveSelectedDisplay', true);
             
-            // Set Default Receive to Binance
             const receiveSelect = document.getElementById('receiveMethod');
             receiveSelect.value = 'binance';
             renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
@@ -612,7 +900,6 @@
             generateStaticTicker(); 
             updateUI(); 
 
-            // Close dropdowns on outside click
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.relative')) {
                     document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show'));
@@ -620,25 +907,252 @@
             });
         });
 
+        // --- NEW: TRACKING LOGIC ---
+        function toggleTrackingModal(show) {
+            const modal = document.getElementById('trackingModal');
+            const resultBox = document.getElementById('trackResult');
+            const loading = document.getElementById('trackLoading');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const input = document.getElementById('trackTrxInput');
+            
+            if(show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                // Reset state
+                input.value = "";
+                resultBox.classList.add('hidden');
+                loading.classList.add('hidden');
+                btnSpinner.classList.add('hidden');
+            }
+        }
+
+        function trackOrder() {
+            const trxId = document.getElementById('trackTrxInput').value.trim().toUpperCase(); 
+            if(!trxId) {
+                showToast("Please enter a TrxID", "error");
+                return;
+            }
+
+            const resultBox = document.getElementById('trackResult');
+            const loading = document.getElementById('trackLoading');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const badge = document.getElementById('trackStatusBadge');
+            const reasonBox = document.getElementById('trackReasonBox');
+            
+            // UI Reset
+            resultBox.classList.add('hidden');
+            reasonBox.classList.add('hidden');
+            
+            // Show Spinner on button & center
+            loading.classList.remove('hidden');
+            btnSpinner.classList.remove('hidden');
+
+            // ⚡ INSTANT CHECK: LocalStorage
+            const localHistory = JSON.parse(localStorage.getItem('tifor_trx_history') || '[]');
+            const localMatch = localHistory.find(item => item.trxId === trxId);
+
+            if (localMatch) {
+                renderTrackResult(localMatch);
+                loading.classList.add('hidden');
+                btnSpinner.classList.add('hidden');
+                fetchOrderData(trxId, true); // Update in background
+            } else {
+                fetchOrderData(trxId, false);
+            }
+        }
+        
+        function fetchOrderData(trxId, isBackground) {
+            const params = {
+                method: "POST",
+                body: JSON.stringify({ action: "search", trxId: trxId })
+            };
+            
+            fetch(GOOGLE_SCRIPT_URL, params)
+            .then(response => response.json())
+            .then(data => {
+                if (!isBackground) {
+                    document.getElementById('trackLoading').classList.add('hidden');
+                    document.getElementById('btnSpinner').classList.add('hidden');
+                }
+                
+                if(data.result === "found") {
+                    renderTrackResult(data);
+                    updateLocalHistory(trxId, data);
+                } else if (!isBackground) {
+                    showToast("Order not found!", "error");
+                    document.getElementById('trackResult').classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (!isBackground) {
+                    document.getElementById('trackLoading').classList.add('hidden');
+                    document.getElementById('btnSpinner').classList.add('hidden');
+                    showToast("Connection Error. Try again.", "error");
+                }
+            });
+        }
+        
+        function renderTrackResult(data) {
+            const resultBox = document.getElementById('trackResult');
+            const badge = document.getElementById('trackStatusBadge');
+            const reasonBox = document.getElementById('trackReasonBox');
+            
+            resultBox.classList.remove('hidden');
+
+            // Populate Data - IMPROVED TIME DISPLAY
+            // If data.time has format YYYY-MM-DD HH:MM AM/PM
+            let displayTime = data.time || "N/A";
+            // If it's a combined timestamp like "2023-10-10 10:30 PM", we ensure spacing
+            // Actually, backend saves: `${userDate} ${formattedTime}` which is "YYYY-MM-DD HH:MM AM/PM"
+            // This already has a space.
+            
+            document.getElementById('trackTime').innerText = displayTime;
+            document.getElementById('trackTrxIdDisplay').innerText = data.trxId || document.getElementById('trackTrxInput').value.toUpperCase();
+            document.getElementById('trackAmountIn').innerText = data.amountIn || "N/A";
+            document.getElementById('trackAmountOut').innerText = data.amountOut || "N/A";
+            
+            // Handle Sender Row - Try to show if available
+            const senderRow = document.getElementById('trackSenderRow');
+            if(data.userIdentifier) {
+                 document.getElementById('trackSender').innerText = data.userIdentifier;
+                 senderRow.classList.remove('hidden');
+            } else {
+                 document.getElementById('trackSender').innerText = "******";
+                 senderRow.classList.remove('hidden');
+            }
+
+            // Status Logic
+            const status = data.status || "Pending";
+            if(status === "Success" || status === "Succeed" || status === "Completed Successfully") {
+                badge.innerText = "Successful";
+                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-green-500/20 text-green-400 border border-green-500/50";
+                reasonBox.classList.add('hidden');
+            } else if (status === "Pending") {
+                badge.innerText = "Pending";
+                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-yellow-500/20 text-yellow-400 border border-yellow-500/50";
+                reasonBox.classList.add('hidden');
+            } else {
+                badge.innerText = status;
+                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-red-500/20 text-red-400 border border-red-500/50";
+                reasonBox.classList.remove('hidden');
+                document.getElementById('trackReasonText').innerText = data.reason || "No reason provided.";
+            }
+        }
+        
+        function updateLocalHistory(trxId, data) {
+             const localHistory = JSON.parse(localStorage.getItem('tifor_trx_history') || '[]');
+             const index = localHistory.findIndex(item => item.trxId === trxId);
+             
+             if (index !== -1) {
+                 localHistory[index] = { ...localHistory[index], ...data }; 
+                 localStorage.setItem('tifor_trx_history', JSON.stringify(localHistory));
+             }
+        }
+
+        // --- TIME DISPLAY HELPER (12 Hour Format) ---
+        function updateTimeDisplay(val) {
+            const visualInput = document.getElementById('visualTimeInput');
+            if(!val) {
+                visualInput.value = "--:-- --";
+                return;
+            }
+            const [h, m] = val.split(':');
+            const hour = parseInt(h);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            const minutes = m.toString().padStart(2, '0');
+            visualInput.value = `${hour12}:${minutes} ${ampm}`;
+        }
+
+        // --- UPDATED: CENTRALIZED STATUS LOGIC FOR DYNAMIC LANGUAGE ---
+        function updateShopStatus() {
+            const now = new Date();
+            const hour = now.getHours();
+            const statusBadge = document.getElementById('statusBadge');
+            const noticeText = document.getElementById('noticeText');
+            const lang = localStorage.getItem('siteLang') || 'bn';
+            
+            // Updated logic for late night closing (e.g. 24 means 12 AM next day which is 00:00)
+            if (hour >= CONFIG.openingHour && hour < CONFIG.closingHour) {
+                isShopOpen = true;
+                const badgeText = (lang === 'en') ? 'Online' : 'অনলাইন';
+                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> ${badgeText}`;
+                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                noticeText.innerText = (lang === 'en') ? CONFIG.notice.en : CONFIG.notice.bn;
+            } else {
+                isShopOpen = false;
+                const badgeText = (lang === 'en') ? 'Offline' : 'অফলাইন';
+                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> ${badgeText}`;
+                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
+                const noticeMsg = (lang === 'en') 
+                    ? "Sorry! We are currently Offline. Please try between 8 AM to 12 AM."
+                    : "দুঃখিত! এখন আমরা অফলাইন। সকাল ৮টা থেকে রাত ১২টা পর্যন্ত চেষ্টা করুন।";
+                noticeText.innerText = noticeMsg;
+                document.getElementById('timePopup').classList.remove('hidden');
+                document.getElementById('timePopup').classList.add('flex');
+            }
+        }
+
+        function toggleGlobalLanguage() {
+            const currentLang = localStorage.getItem('siteLang') || 'bn';
+            const newLang = currentLang === 'bn' ? 'en' : 'bn';
+            localStorage.setItem('siteLang', newLang);
+            applyGlobalLanguage(newLang);
+            updateUI(); 
+            updateShopStatus();
+        }
+
+        function applyGlobalLanguage(lang) {
+            const bnEls = document.querySelectorAll('.lang-bn');
+            const enEls = document.querySelectorAll('.lang-en');
+            const contentBn = document.getElementById('content-bn');
+            const contentEn = document.getElementById('content-en');
+
+            if (lang === 'en') {
+                bnEls.forEach(el => el.classList.add('hidden'));
+                enEls.forEach(el => el.classList.remove('hidden'));
+                if(contentBn) contentBn.classList.add('hidden');
+                if(contentEn) contentEn.classList.remove('hidden');
+                document.documentElement.lang = "en";
+            } else {
+                bnEls.forEach(el => el.classList.remove('hidden'));
+                enEls.forEach(el => el.classList.add('hidden'));
+                if(contentBn) contentBn.classList.remove('hidden');
+                if(contentEn) contentEn.classList.add('hidden');
+                document.documentElement.lang = "bn";
+            }
+        }
+
+        function togglePrivacy(show) {
+            const modal = document.getElementById('privacyModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                const lang = localStorage.getItem('siteLang') || 'bn';
+                applyGlobalLanguage(lang); 
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
         // --- Custom Dropdown Logic ---
         function renderDropdown(selectId, optionsId, displayId, isReceive) {
             const select = document.getElementById(selectId);
             const optionsContainer = document.getElementById(optionsId);
-            
             select.innerHTML = '';
             optionsContainer.innerHTML = '';
 
             methods.forEach(m => {
-                // Populate Hidden Select
                 if (isReceive && m.id === 'bkash') {
                     select.innerHTML += `<option value="${m.id}" disabled>${m.name}</option>`;
                 } else {
                     select.innerHTML += `<option value="${m.id}">${m.name}</option>`;
                 }
 
-                // Populate Custom UI
                 const isDisabled = (isReceive && m.id === 'bkash') ? 'disabled' : '';
-                // Fallback handled in onError
                 const logoHtml = `<img src="${m.logo}" class="w-6 h-6 rounded-full object-contain bg-white p-[2px]" onerror="this.src='https://via.placeholder.com/24?text=${m.name[0]}'">`;
                 
                 const optionDiv = document.createElement('div');
@@ -652,11 +1166,8 @@
                     select.dispatchEvent(new Event('change'));
                     document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show'));
                 };
-
                 optionsContainer.appendChild(optionDiv);
             });
-
-            // Set initial display
             renderDropdownSelection(selectId, displayId);
         }
 
@@ -664,9 +1175,7 @@
             const select = document.getElementById(selectId);
             const display = document.getElementById(displayId);
             const selectedMethod = methods.find(m => m.id === select.value);
-            
             if (selectedMethod) {
-                // UPDATED: Used object-contain, bg-white, and padding for better logo fit
                 display.innerHTML = `
                     <img src="${selectedMethod.logo}" class="w-8 h-8 rounded-full object-contain bg-white shadow-md border border-white/20 p-1" onerror="this.src='https://via.placeholder.com/32?text=${selectedMethod.name[0]}'">
                     <span class="font-bold text-lg tracking-wide">${selectedMethod.name}</span>
@@ -675,7 +1184,6 @@
         }
 
         function toggleDropdown(id) {
-            // Close others first
             document.querySelectorAll('.custom-options').forEach(el => {
                 if (el.id !== id) el.classList.remove('show');
             });
@@ -685,37 +1193,29 @@
         function swapMethods() {
             const sendSelect = document.getElementById('sendMethod');
             const receiveSelect = document.getElementById('receiveMethod');
-            
             const temp = sendSelect.value;
             sendSelect.value = receiveSelect.value;
-            
-            // Re-enable options logic handles inside updateUI, but for swap we need to check validity
-            const receiveOptions = document.getElementById('receiveOptions').children;
-            // Simplified swap logic: just set value and let updateUI handle disable state
             receiveSelect.value = temp;
-            
             updateUI();
         }
 
         function updateUI() {
             const sendId = document.getElementById('sendMethod').value;
             const receiveId = document.getElementById('receiveMethod').value;
+            const lang = localStorage.getItem('siteLang') || 'bn';
             
             let sendObj = methods.find(m => m.id === sendId);
             let receiveObj = methods.find(m => m.id === receiveId);
 
-            // Prevent Same Method
             if (sendId === receiveId) {
                 const newReceiveObj = methods.find(m => m.id !== sendId);
                 document.getElementById('receiveMethod').value = newReceiveObj.id;
                 receiveObj = newReceiveObj; 
             }
 
-            // Update Custom Dropdown Visuals
             renderDropdownSelection('sendMethod', 'sendSelectedDisplay');
             renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
 
-            // Disable Logic in Custom Dropdown
             const receiveOptions = document.getElementById('receiveOptions').children;
             Array.from(receiveOptions).forEach(opt => {
                 const val = opt.getAttribute('data-value');
@@ -737,20 +1237,19 @@
             amountInput.placeholder = `${sendObj.min}-${sendObj.max}`;
             document.getElementById('minAmountHint').innerText = `Limit: ${sendObj.min} - ${sendObj.max} ${sendObj.type.toUpperCase()}`;
 
-            // Labels
             const senderLabel = document.getElementById('senderLabel');
             const userNumberInput = document.getElementById('userNumber');
             const trxLabel = document.getElementById('trxLabel');
             const userTrxInput = document.getElementById('userTrxID');
 
             if (sendObj.type === 'bdt') {
-                senderLabel.innerText = `আপনার ${sendObj.name} নাম্বার (শেষ ৪ ডিজিট)`;
+                senderLabel.innerText = (lang === 'en') ? `Your ${sendObj.name} Number (Last 4)` : `আপনার ${sendObj.name} নাম্বার (শেষ ৪ ডিজিট)`;
                 userNumberInput.placeholder = "Example: 1234";
                 userNumberInput.setAttribute('inputmode', 'numeric');
                 trxLabel.innerText = `${sendObj.name} TrxID`;
-                userTrxInput.placeholder = sendObj.trxHint || "TrxID দিন...";
+                userTrxInput.placeholder = sendObj.trxHint || "TrxID...";
             } else {
-                senderLabel.innerText = `আপনার ${sendObj.name} ${sendObj.label} (Last 4-6)`; 
+                senderLabel.innerText = (lang === 'en') ? `Your ${sendObj.name} ${sendObj.label} (Last 4-6)` : `আপনার ${sendObj.name} ${sendObj.label} (Last 4-6)`; 
                 userNumberInput.placeholder = `Last digits`;
                 userNumberInput.setAttribute('inputmode', 'numeric');
                 trxLabel.innerText = `${sendObj.name} ${sendObj.trxType}`; 
@@ -762,15 +1261,15 @@
             const receiverHint = document.getElementById('receiverHint');
             
             if(receiveObj.type === 'bdt') {
-                receiverLabel.innerText = `যে ${receiveObj.name} নাম্বারে টাকা নিবেন`;
+                receiverLabel.innerText = (lang === 'en') ? `Receiver ${receiveObj.name} Number` : `যে ${receiveObj.name} নাম্বারে টাকা নিবেন`;
                 receiverInput.placeholder = "01xxxxxxxxx";
                 receiverInput.setAttribute('inputmode', 'numeric');
-                receiverHint.innerText = `সতর্কতা: সঠিক ${receiveObj.name} নাম্বার দিন।`;
+                receiverHint.innerText = (lang === 'en') ? `Caution: Provide correct ${receiveObj.name} number.` : `সতর্কতা: সঠিক ${receiveObj.name} নাম্বার দিন।`;
             } else {
-                receiverLabel.innerText = `যে ${receiveObj.name} আইডিতে ডলার নিবেন`;
-                receiverInput.placeholder = `${receiveObj.label} দিন...`;
+                receiverLabel.innerText = (lang === 'en') ? `Receiver ${receiveObj.name} ID` : `যে ${receiveObj.name} আইডিতে ডলার নিবেন`;
+                receiverInput.placeholder = (lang === 'en') ? `Enter ${receiveObj.label}...` : `${receiveObj.label} দিন...`;
                 receiverInput.setAttribute('inputmode', 'text');
-                receiverHint.innerText = `সতর্কতা: সঠিক ${receiveObj.name} ${receiveObj.label} দিন। শুধুমাত্র সংখ্যা।`;
+                receiverHint.innerText = (lang === 'en') ? `Caution: Correct ${receiveObj.name} ${receiveObj.label} only.` : `সতর্কতা: সঠিক ${receiveObj.name} ${receiveObj.label} দিন।`;
             }
 
             document.getElementById('adminMethodName').innerText = sendObj.name;
@@ -781,13 +1280,20 @@
             validateForm(); 
         }
 
-        // --- CORE VALIDATION LOGIC ---
         function validateForm() {
-            // NOTE: Validation runs even if closed, but button click is blocked
             const sendAmount = parseFloat(document.getElementById('sendAmount').value);
             const rawUserNumber = document.getElementById('userNumber').value;
             const rawUserTrxID = document.getElementById('userTrxID').value;
             const rawReceiverDetails = document.getElementById('receiverDetails').value;
+            const rawUserWhatsapp = document.getElementById('userWhatsapp').value;
+            const userDate = document.getElementById('userDate').value;
+            
+            // ✅ Time Fields Validation
+            const userHour = document.getElementById('userHour').value;
+            const userMin = document.getElementById('userMin').value;
+            const userAmPm = document.getElementById('userAmPm').value;
+
+            const lang = localStorage.getItem('siteLang') || 'bn';
             
             const userNumberVal = rawUserNumber.trim().toUpperCase();
             if(rawUserTrxID !== rawUserTrxID.toUpperCase()) document.getElementById('userTrxID').value = rawUserTrxID.toUpperCase();
@@ -831,20 +1337,24 @@
             let equivalentBDT = (sendObj.type === 'bdt') ? sendAmount : sendAmount * CONFIG.rates.usdToBdt;
             if (isValid && equivalentBDT > CONFIG.maxBDTValue) {
                 isValid = false;
-                showWarning(`দুঃখিত! ৫০০ টাকার (${CONFIG.maxBDTValue} BDT) বেশি লেনদেন করা যাবে না।`);
+                const msg = (lang === 'en') 
+                    ? `Sorry! Max transaction limit is 500 BDT (${CONFIG.maxBDTValue}).` 
+                    : `দুঃখিত! ৫০০ টাকার (${CONFIG.maxBDTValue} BDT) বেশি লেনদেন করা যাবে না।`;
+                showWarning(msg);
             }
 
             // 3. Sender Validation
             if (rawUserNumber.length > 0) {
                 if(rawUserNumber.includes(' ')) {
                     isValid = false;
-                    senderError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> স্পেস নিষেধ!';
+                    senderError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No Space!';
                     senderError.classList.remove('hidden');
                     senderInput.classList.add('input-error');
                 }
                 else if (sendObj.senderPattern && !sendObj.senderPattern.test(userNumberVal)) {
                     isValid = false;
-                    senderError.innerHTML = sendObj.type === 'bdt' ? '<i class="fa-solid fa-xmark"></i> শেষ ৪ সংখ্যা!' : '<i class="fa-solid fa-xmark"></i> শেষ ৪-৬ সংখ্যা!';
+                    const err = (lang === 'en') ? 'Last 4-6 digits!' : 'শেষ ৪-৬ সংখ্যা!';
+                    senderError.innerHTML = `<i class="fa-solid fa-xmark"></i> ${err}`;
                     senderError.classList.remove('hidden');
                     senderInput.classList.add('input-error');
                 }
@@ -854,41 +1364,59 @@
             if (rawUserTrxID.length > 0) {
                 if(rawUserTrxID.includes(' ')) {
                      isValid = false;
-                     trxError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> স্পেস নিষেধ!';
+                     trxError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No Space!';
                      trxError.classList.remove('hidden');
                      trxInput.classList.add('input-error');
                 }
                 else if (sendObj.trxPattern && !sendObj.trxPattern.test(userTrxIDVal)) {
                     isValid = false;
-                    trxError.innerHTML = '<i class="fa-solid fa-xmark"></i> ভুল ফরম্যাট!';
+                    const err = (lang === 'en') ? 'Invalid Format!' : 'ভুল ফরম্যাট!';
+                    trxError.innerHTML = `<i class="fa-solid fa-xmark"></i> ${err}`;
                     trxError.classList.remove('hidden');
                     trxInput.classList.add('input-error');
                 }
             } else { isValid = false; }
 
-            // 5. Receiver Validation
+            // 5. Date & Time Validation
+            if (!userDate || !userHour || !userMin) {
+                isValid = false;
+            }
+
+            // 6. Whatsapp Validation (NEW)
+            if (!rawUserWhatsapp || rawUserWhatsapp.length < 11) {
+                isValid = false;
+            }
+
+            // 7. Receiver Validation
             if (rawReceiverDetails.length > 0) {
                 if(rawReceiverDetails.includes(' ')) {
                     isValid = false;
-                    receiverError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> স্পেস নিষেধ!';
+                    receiverError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No Space!';
                     receiverError.classList.remove('hidden');
                     receiverInput.classList.add('input-error');
                 }
                 else if (receiveObj.receiverPattern && !receiveObj.receiverPattern.test(receiverVal)) {
                     isValid = false;
-                    receiverError.innerHTML = receiveObj.type === 'bdt' ? '<i class="fa-solid fa-xmark"></i> ভুল নাম্বার!' : '<i class="fa-solid fa-xmark"></i> ভুল UID!';
+                    const err = (lang === 'en') ? 'Invalid ID/Number!' : 'ভুল নাম্বার/ID!';
+                    receiverError.innerHTML = `<i class="fa-solid fa-xmark"></i> ${err}`;
                     receiverError.classList.remove('hidden');
                     receiverInput.classList.add('input-error');
                 }
             } else { isValid = false; }
 
-            // 6. Button Toggle
+            // 8. Preview & Button Toggle
             const btn = document.getElementById('submitBtn');
+            const previewBox = document.getElementById('dynamicSendPreview');
+            const previewAmount = document.getElementById('displaySendAmount');
+
             if(isValid) {
+                previewBox.classList.remove('hidden');
+                previewAmount.innerText = `${sendAmount} ${sendObj.type.toUpperCase()}`;
                 btn.disabled = false;
                 btn.classList.remove('bg-gradient-to-r', 'from-gray-700', 'to-gray-800', 'text-gray-400', 'cursor-not-allowed', 'border-white/10');
                 btn.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-700', 'text-white', 'cursor-pointer', 'shadow-emerald-500/20', 'animate-pulse');
             } else {
+                previewBox.classList.add('hidden');
                 btn.disabled = true;
                 btn.classList.add('bg-gradient-to-r', 'from-gray-700', 'to-gray-800', 'text-gray-400', 'cursor-not-allowed', 'border-white/10');
                 btn.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-700', 'text-white', 'cursor-pointer', 'shadow-emerald-500/20', 'animate-pulse');
@@ -944,9 +1472,15 @@
             if(amount < sendObj.min || amount > sendObj.max || equivalentBDT > CONFIG.maxBDTValue) {
                 breakdownBox.classList.add('hidden');
                 warningBox.classList.remove('hidden');
-                if(amount < sendObj.min) warningText.innerText = `মিনিমাম ${sendObj.min} ${sendObj.type.toUpperCase()}`;
-                else if(amount > sendObj.max) warningText.innerText = `ম্যাক্সিমাম ${sendObj.max} ${sendObj.type.toUpperCase()}`;
-                else if(equivalentBDT > CONFIG.maxBDTValue) warningText.innerText = `লিমিট: ৫০০ টাকার বেশি সম্ভব না।`;
+                
+                const lang = localStorage.getItem('siteLang') || 'bn';
+                if(amount < sendObj.min) 
+                    warningText.innerText = (lang === 'en') ? `Min ${sendObj.min} ${sendObj.type.toUpperCase()}` : `মিনিমাম ${sendObj.min} ${sendObj.type.toUpperCase()}`;
+                else if(amount > sendObj.max) 
+                    warningText.innerText = (lang === 'en') ? `Max ${sendObj.max} ${sendObj.type.toUpperCase()}` : `ম্যাক্সিমাম ${sendObj.max} ${sendObj.type.toUpperCase()}`;
+                else if(equivalentBDT > CONFIG.maxBDTValue) 
+                    warningText.innerText = (lang === 'en') ? `Limit: Max 500 BDT allowed.` : `লিমিট: ৫০০ টাকার বেশি সম্ভব না।`;
+                
                 document.getElementById('receiveAmount').innerText = "0.00";
                 return;
             }
@@ -954,8 +1488,9 @@
             warningBox.classList.add('hidden');
             breakdownBox.classList.remove('hidden');
 
+            const lang = localStorage.getItem('siteLang') || 'bn';
             document.getElementById('rateDisplay').innerText = result.rateText;
-            document.getElementById('feeLabel').innerText = `ফি চার্জ ${result.feeDesc}:`;
+            document.getElementById('feeLabel').innerText = (lang === 'en') ? `Fee ${result.feeDesc}:` : `ফি চার্জ ${result.feeDesc}:`;
             document.getElementById('feeDisplay').innerText = `- ${result.fee.toFixed(2)} ${sendObj.type.toUpperCase()}`;
             document.getElementById('receiveAmount').innerText = result.finalAmount.toFixed(2);
             document.getElementById('finalReceiveDisplay').innerText = `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`;
@@ -967,8 +1502,11 @@
             document.getElementById('warningText').innerText = msg;
         }
 
+        function playSound() {
+            CLICK_SOUND.play().catch(e => console.log("Audio play failed:", e));
+        }
+
         function processOrder() {
-            // Check Shop Open Status First
             if(!isShopOpen) {
                 document.getElementById('timePopup').classList.remove('hidden');
                 document.getElementById('timePopup').classList.add('flex');
@@ -978,13 +1516,24 @@
             const btn = document.getElementById('submitBtn');
             if(btn.disabled) return;
 
-            // Trigger Fireworks (Fuljhuri)
+            // ✅ 1. PLAY SOUND
+            playSound();
+
+            // ✅ 2. FIRE CONFETTI
             fireConfetti();
 
             const sendAmount = parseFloat(document.getElementById('sendAmount').value);
             const userNumber = document.getElementById('userNumber').value.trim().toUpperCase();
             const userTrxID = document.getElementById('userTrxID').value.trim().toUpperCase();
             const receiverDetails = document.getElementById('receiverDetails').value.trim();
+            const userWhatsapp = document.getElementById('userWhatsapp').value.trim(); 
+            const userDate = document.getElementById('userDate').value;
+            
+            // Get Time Inputs
+            const userHour = document.getElementById('userHour').value;
+            const userMin = document.getElementById('userMin').value;
+            const userAmPm = document.getElementById('userAmPm').value;
+            const formattedTime = `${userHour}:${userMin} ${userAmPm}`;
             
             const sendId = document.getElementById('sendMethod').value;
             const receiveId = document.getElementById('receiveMethod').value;
@@ -993,7 +1542,51 @@
 
             const result = calculateValues(sendAmount, sendObj, receiveObj);
 
-            const message = `
+            // ✅ 3. PREPARE DATA
+            const sheetData = {
+                platform: `${sendObj.name} To ${receiveObj.name}`,
+                type: sendObj.type,
+                userIdentifier: userNumber,
+                trxId: userTrxID,
+                amountReceived: `${sendAmount} ${sendObj.type.toUpperCase()}`,
+                amountSent: `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`,
+                receiverDetails: `'${receiverDetails}`, // NEW COLUMN
+                contact: `'${userWhatsapp}`, // NOW FOR WHATSAPP
+                timestamp: `${userDate} ${formattedTime}`,
+                rawDate: userDate,
+                action: "create" // ✅ স্পেশাল সিগন্যাল স্ক্রিপ্টের জন্য
+            };
+            
+            // ✅ 4. LOCAL STORAGE CACHE FOR INSTANT SEARCH
+            // Store transaction data locally so user can search it immediately even before server sync
+            const localHistory = JSON.parse(localStorage.getItem('tifor_trx_history') || '[]');
+            // Create a local representation of the order status
+            const localOrder = {
+                trxId: userTrxID,
+                status: 'Pending',
+                reason: '',
+                time: formattedTime,
+                amountIn: sheetData.amountReceived,
+                amountOut: sheetData.amountSent,
+                userIdentifier: userNumber,
+                timestamp: Date.now() // Add timestamp for expiry if needed later
+            };
+            // Add to history (keep last 20)
+            localHistory.unshift(localOrder);
+            if (localHistory.length > 20) localHistory.pop();
+            localStorage.setItem('tifor_trx_history', JSON.stringify(localHistory));
+
+            // ✅ 5. SEND TO SHEET (IMMEDIATELY)
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(sheetData)
+            }).catch(err => console.error("Sheet Error:", err));
+
+            // ✅ 6. OPEN WHATSAPP (WITH TINY DELAY FOR SOUND/VISUALS)
+            setTimeout(() => {
+                const message = `
 *🚀 NEW ORDER (Money Exchanger BD)*
 ------------------
 🔄 *Exchange:* ${sendObj.name} ➡️ ${receiveObj.name}
@@ -1003,16 +1596,47 @@
 ------------------
 👤 *Sender (End):* ${userNumber}
 🔢 *TrxID:* ${userTrxID}
+📅 *Date:* ${userDate}
+⏰ *Time:* ${formattedTime}
 ------------------
 📥 *Receiver:* ${receiverDetails}
+📞 *Contact:* ${userWhatsapp}
 ------------------
 ✅ *Status: PENDING*
-            `.trim();
+                `.trim();
 
-            setTimeout(() => {
                 const whatsappUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
-            }, 1500); // Slightly longer delay to enjoy the fireworks
+
+                // ✅ 7. RESET FORM
+                document.getElementById('sendAmount').value = '';
+                document.getElementById('userNumber').value = '';
+                document.getElementById('userTrxID').value = '';
+                document.getElementById('receiverDetails').value = '';
+                document.getElementById('userWhatsapp').value = '';
+                
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                document.getElementById('userDate').value = dateStr;
+                
+                let hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                
+                document.getElementById('userHour').value = hours;
+                document.getElementById('userMin').value = minutes;
+                document.getElementById('userAmPm').value = ampm;
+
+                document.getElementById('dynamicSendPreview').classList.add('hidden');
+                document.getElementById('calcBreakdown').classList.add('hidden');
+                
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.classList.add('bg-gradient-to-r', 'from-gray-700', 'to-gray-800', 'text-gray-400', 'cursor-not-allowed', 'border-white/10');
+                btn.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-700', 'text-white', 'cursor-pointer', 'shadow-emerald-500/20', 'animate-pulse');
+            }, 500); // 500ms delay feels "immediate" but allows sound to start
         }
 
         function copyToClipboard(elementId) {
@@ -1021,8 +1645,12 @@
             textarea.value = text;
             document.body.appendChild(textarea);
             textarea.select();
-            try { document.execCommand('copy'); showToast("কপি করা হয়েছে! ✅", "success"); } 
-            catch (err) { showToast("কপি হয়নি!", "error"); }
+            try { 
+                document.execCommand('copy'); 
+                const lang = localStorage.getItem('siteLang') || 'bn';
+                showToast(lang === 'en' ? "Copied! ✅" : "কপি করা হয়েছে! ✅", "success"); 
+            } 
+            catch (err) { showToast("Failed to copy!", "error"); }
             document.body.removeChild(textarea);
         }
 
@@ -1054,7 +1682,6 @@
             }
         }
 
-        // --- ENHANCED FIREWORKS (FULJHURI) ---
         function fireConfetti() {
             const canvas = document.getElementById('confetti');
             const ctx = canvas.getContext('2d');
@@ -1062,24 +1689,23 @@
             canvas.height = window.innerHeight;
 
             const particles = [];
-            const particleCount = 200; // Increased count for "Fuljhuri" effect
+            const particleCount = 200; 
 
             for(let i=0; i<particleCount; i++) {
                 particles.push({
-                    x: canvas.width / 2, // Start from center
+                    x: canvas.width / 2, 
                     y: canvas.height / 2,
-                    vx: (Math.random() - 0.5) * 20, // Faster explosion
+                    vx: (Math.random() - 0.5) * 20, 
                     vy: (Math.random() - 0.5) * 20,
                     color: `hsl(${Math.random() * 360}, 100%, 60%)`,
                     size: Math.random() * 6 + 2,
-                    life: 100 // Add life to fade out
+                    life: 100 
                 });
             }
 
             function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear screen
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
                 
-                // Add composite operation for glowing effect
                 ctx.globalCompositeOperation = 'lighter';
 
                 for (let i = particles.length - 1; i >= 0; i--) {
@@ -1087,8 +1713,8 @@
                     
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vy += 0.2; // Gravity
-                    p.vx *= 0.95; // Friction
+                    p.vy += 0.2; 
+                    p.vx *= 0.95; 
                     p.life--;
 
                     if (p.life <= 0) {
@@ -1110,7 +1736,6 @@
             animate();
         }
 
-        // --- TICKER ---
         function generateStaticTicker() {
             const list = document.getElementById('transactionList');
             const listClone = document.getElementById('transactionListClone');
@@ -1135,8 +1760,6 @@
                 const action = Math.random() > 0.5 ? "Sent" : "Received";
                 const colorClass = action === "Sent" ? "text-red-400" : "text-emerald-400";
                 const icon = action === "Sent" ? "fa-arrow-up" : "fa-arrow-down";
-
-                // UPDATED: Used object-contain, bg-white, and padding for ticker as well
                 const logoHtml = `<img src="${platform.logo}" class="w-full h-full rounded-full object-contain bg-white p-1" onerror="this.src='https://via.placeholder.com/32?text=${platform.name[0]}'" loading="lazy">`;
 
                 html += `
