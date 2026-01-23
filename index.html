@@ -1191,7 +1191,7 @@
 
             if (sendObj.type === 'bdt') {
                 senderLabel.innerText = (lang === 'en') ? `Enter the ${sendObj.name} number/UID from which you sent the money/dollars.` : `আপনি ${sendObj.name} যে নাম্বার থেকে টাকা/ডলার পাঠিয়েছেন সেই Number/UID দিন `;
-                userNumberInput.placeholder = "Example: 1234";
+                userNumberInput.placeholder = "Example:01xxxxxxxxx";
                 userNumberInput.setAttribute('inputmode', 'numeric');
                 trxLabel.innerText = `${sendObj.name} TrxID`;
                 userTrxInput.placeholder = sendObj.trxHint || "TrxID...";
