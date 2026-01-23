@@ -213,16 +213,16 @@
                 bdt: "9812+",
                 usdt: "98+"
             },
-            defaultFeePercentage: 0, // Not used anymore for BDT, using tiered fee
+            defaultFeePercentage: 0, 
             cashoutRates: { bkash: 1.85, nagad: 1.25, rocket: 1.8, upay: 1.4, tallykhata: 1.5 },
-            officialExtraPercentage: 0, // Removed 3%
+            officialExtraPercentage: 0, 
             rates: { usdToBdt: 118.50, bdtToUsd: 125.00 },
 
             accounts: {
                 bkash: "01309559570", 
                 nagad: "01309559570",
                 upay: "01309559570",
-                rocket: "01309559570",
+                rocket: "01309559570", // Storing 11 digit main number here
                 tallykhata: "01309559570",
                 redotpay: "1589529007",
                 bitget: "7487995164",
@@ -236,38 +236,39 @@
         };
     </script>
 
-    <!-- Header -->
+    <!-- Header (Mobile Fixed) -->
     <header class="glass-panel sticky top-0 z-50 border-b-0">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <i class="fa-solid fa-money-bill-transfer text-white text-xl animate-pulse"></i>
+        <div class="container mx-auto px-4 py-2 md:py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                    <i class="fa-solid fa-money-bill-transfer text-white text-sm md:text-xl animate-pulse"></i>
                 </div>
-                <!-- ✅ Header Title Fixed for Mobile -->
-                <div>
-                    <h1 class="text-lg md:text-2xl font-bold tracking-wide text-white whitespace-nowrap">
+                <!-- ✅ Header Title Optimized for Mobile -->
+                <div class="leading-tight">
+                    <h1 class="text-base md:text-2xl font-bold tracking-wide text-white whitespace-nowrap">
                         Money <span class="text-emerald-400">Exchanger</span> BD
                     </h1>
-                    <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest font-bold">Fast & Secure</p>
+                    <p class="text-[8px] md:text-[10px] text-emerald-400/80 uppercase tracking-widest font-bold">Fast & Secure</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="toggleTrackingModal(true)" class="w-8 h-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition-all group mr-2 shadow-[0_0_10px_rgba(16,185,129,0.2)]" title="Track Order">
-                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                <button onclick="toggleTrackingModal(true)" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition-all group shadow-[0_0_10px_rgba(16,185,129,0.2)]" title="Track Order">
+                    <i class="fa-solid fa-magnifying-glass text-xs md:text-sm"></i>
                 </button>
 
-                <button onclick="toggleGlobalLanguage()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group mr-2" title="Change Language">
-                    <i class="fa-solid fa-earth-americas text-emerald-400 group-hover:rotate-180 transition-transform duration-500"></i>
+                <button onclick="toggleGlobalLanguage()" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group" title="Change Language">
+                    <i class="fa-solid fa-earth-americas text-emerald-400 group-hover:rotate-180 transition-transform duration-500 text-xs md:text-sm"></i>
                 </button>
 
-                <div id="statusBadge" class="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner">
+                <!-- ✅ Mobile Optimized Status Badge -->
+                <div id="statusBadge" class="px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner whitespace-nowrap">
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-r from-emerald-900/40 via-black/40 to-emerald-900/40 text-emerald-100 text-xs py-1 border-y border-white/5 backdrop-blur-sm">
+        <div class="bg-gradient-to-r from-emerald-900/40 via-black/40 to-emerald-900/40 text-emerald-100 text-[10px] md:text-xs py-1 border-y border-white/5 backdrop-blur-sm">
             <div class="container mx-auto flex items-center gap-2 px-4">
-                <span class="bg-red-500 text-white px-2 rounded text-[10px] font-bold animate-pulse">LIVE</span>
+                <span class="bg-red-500 text-white px-1.5 md:px-2 rounded text-[9px] md:text-[10px] font-bold animate-pulse">LIVE</span>
                 <marquee behavior="scroll" direction="left" id="noticeText">Loading...</marquee>
             </div>
         </div>
@@ -370,6 +371,12 @@
                                 <span id="feeLabel">ফি:</span>
                                 <span id="feeDisplay" class="eng-font">- 0.00</span>
                             </div>
+                            <!-- ✅ Added Send Money Fee Display -->
+                            <div id="sendFeeRow" class="flex justify-between items-center text-orange-300 font-medium relative z-10 hidden">
+                                <span class="lang-bn">সেন্ড মানি খরচ:</span><span class="lang-en hidden">Send Money Fee:</span>
+                                <span id="sendFeeDisplay" class="eng-font">- 5.00 BDT</span>
+                            </div>
+
                             <div class="border-t border-white/10 pt-2 flex justify-between text-white font-bold text-lg relative z-10">
                                 <span>
                                     <span class="lang-bn">মোট পাবেন:</span>
@@ -403,8 +410,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label id="senderLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">সেন্ডার নাম্বার</label>
-                                    <!-- ✅ 11 Digit limit & slice -->
-                                    <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" maxlength="11" oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all">
+                                    <!-- ✅ 4 Digit Limit Logic Applied Here -->
+                                    <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" maxlength="4" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all text-center tracking-widest text-lg font-bold">
                                     <p id="senderError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
                                 <div class="relative">
@@ -427,12 +434,11 @@
                                 <p class="text-[10px] text-gray-500 mt-1 ml-1" id="receiverHint"></p>
                             </div>
 
-                             <!-- ✅ WHATSAPP NUMBER INPUT (AT BOTTOM & LIMIT ADDED) -->
+                             <!-- ✅ WHATSAPP NUMBER INPUT -->
                             <div class="relative">
                                 <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
                                     <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
                                 </label>
-                                <!-- ✅ 11 Digit limit & slice -->
                                 <input type="tel" id="userWhatsapp" placeholder="01xxxxxxxxx" inputmode="numeric" maxlength="11" oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all">
                                 <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
                             </div>
@@ -461,7 +467,7 @@
                             </div>
                         </div>
 
-                         <!-- ✅ Admin Info & QR Code MOVED HERE (Before Confirm Button) -->
+                         <!-- ✅ Admin Info & Copy Button Modified -->
                         <div class="mt-8">
                             <div class="glass-input p-4 rounded-xl relative overflow-hidden">
                                 <h3 class="text-white font-bold mb-3 flex items-center gap-2 text-sm">
@@ -474,7 +480,7 @@
                                     <div class="flex-1 w-full bg-black/30 p-3 rounded-lg border border-white/10 flex justify-between items-center">
                                         <div>
                                             <p id="adminMethodName" class="text-[10px] text-gray-400 font-bold uppercase mb-1">BKASH</p>
-                                            <p class="text-lg font-bold text-white eng-font tracking-wider"><span id="adminNumberText">Loading...</span> <span id="adminAccountType" class="text-[10px] font-normal text-emerald-400 bg-emerald-400/10 px-1 rounded ml-1"></span></p>
+                                            <p class="text-lg font-bold text-white eng-font tracking-wider"><span id="adminNumberText" data-copy-value="">Loading...</span> <span id="adminAccountType" class="text-[10px] font-normal text-emerald-400 bg-emerald-400/10 px-1 rounded ml-1"></span></p>
                                         </div>
                                         <button onclick="copyToClipboard('adminNumberText')" class="bg-white/10 hover:bg-white/20 text-white w-8 h-8 rounded flex items-center justify-center transition-colors">
                                             <i class="fa-regular fa-copy"></i>
@@ -781,7 +787,7 @@
 
     <!-- MAIN LOGIC -->
     <script>
-        // ✅ REGEX PATTERNS (Updated from your requirements)
+        // ✅ REGEX PATTERNS (Updated to only strict 4 digits for sender logic later)
         const patterns = {
             // Bkash: Exactly 10 characters, Must contain Mixed (Letters + Numbers)
             bkash: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10}$/,
@@ -803,6 +809,8 @@
             mexc: /^[0-9]{6,9}$/,
             redotpay: /^REDOT[0-9]{5,8}$/,
             bdNumber: /^(01[3-9][0-9]{8})$/,
+            // ✅ Only 4 Digits for sender input
+            fourDigits: /^\d{4}$/,
             // Only for generic receiver validation if strictly numbers
             cryptoUID: /^[0-9]{6,20}$/
         };
@@ -810,30 +818,29 @@
         const methods = [
             { 
                 id: 'bkash', name: 'Bkash', type: 'bdt', bgClass: 'from-pink-600 to-pink-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.bdNumber, trxPattern: patterns.bkash, trxHint: "Example: 9H7J5K...", receiverPattern: patterns.bdNumber,
+                senderPattern: patterns.fourDigits, trxPattern: patterns.bkash, trxHint: "Example: 9H7J5K...", receiverPattern: patterns.bdNumber,
                 logo: "https://play-lh.googleusercontent.com/1CRcUfmtwvWxT2g-xJF8s9_btha42TLi6Lo-qVkVomXBb_citzakZX9BbeY51iholWs"
             },
             { 
                 id: 'nagad', name: 'Nagad', type: 'bdt', bgClass: 'from-orange-600 to-orange-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.bdNumber, trxPattern: patterns.nagad, trxHint: "Example: 7F3D...", receiverPattern: patterns.bdNumber,
+                senderPattern: patterns.fourDigits, trxPattern: patterns.nagad, trxHint: "Example: 7F3D...", receiverPattern: patterns.bdNumber,
                 logo: "https://play-lh.googleusercontent.com/9ps_d6nGKQzfbsJfMaFR0RkdwzEdbZV53ReYCS09Eo5MV-GtVylFD-7IHcVktlnz9Mo=w240-h480-rw"
             },
             { 
                 id: 'upay', name: 'Upay', type: 'bdt', bgClass: 'from-yellow-500 to-yellow-700', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.bdNumber, trxPattern: patterns.upay, trxHint: "Example: U7G...", receiverPattern: patterns.bdNumber,
+                senderPattern: patterns.fourDigits, trxPattern: patterns.upay, trxHint: "Example: U7G...", receiverPattern: patterns.bdNumber,
                 logo: "https://play-lh.googleusercontent.com/ihEz3fNdT5fFzUr0ThhdT_6b5MPPTImKwoUDAujHrn37KDEDAqq-xGnxwFIGI9cbvOE=w240-h480-rw"
             },
             { 
                 id: 'rocket', name: 'Rocket', type: 'bdt', bgClass: 'from-purple-600 to-purple-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.bdNumber, trxPattern: patterns.rocket, trxHint: "Example: R8K...", receiverPattern: patterns.bdNumber,
+                senderPattern: patterns.fourDigits, trxPattern: patterns.rocket, trxHint: "Example: R8K...", receiverPattern: patterns.bdNumber,
                 logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8=w240-h480-rw"
             },
             { 
                 id: 'tallykhata', name: 'TallyKhata', type: 'bdt', bgClass: 'from-red-700 to-red-900', min: 10, max: 2222, label: 'Wallet', trxType: 'TrxID',
-                senderPattern: patterns.bdNumber, trxPattern: patterns.tallykhata, trxHint: "Example: T9L...", receiverPattern: patterns.bdNumber,
+                senderPattern: patterns.fourDigits, trxPattern: patterns.tallykhata, trxHint: "Example: T9L...", receiverPattern: patterns.bdNumber,
                 logo: "https://play-lh.googleusercontent.com/96_mWv5NI3VsON40Wt1l5Xjw2gjy36hzbv5oRf10Vawtf9hKZjgnWqy7_i30-HqapndX=s48-rw" 
             },
-            // ✅ USD Min/Max adjusted approx for 10-2222 BDT (0.1 - 18 USD)
             { 
                 id: 'redotpay', name: 'RedotPay', type: 'usd', bgClass: 'from-red-600 to-red-800', min: 0.10, max: 18.00, label: 'ID', trxType: 'Order ID',
                 senderPattern: patterns.redotpay, trxPattern: /^REDOT[0-9]{5,8}$/, trxHint: "Starts with REDOT...", receiverPattern: patterns.redotpay,
@@ -1028,14 +1035,14 @@
             if (hour >= CONFIG.openingHour && hour < CONFIG.closingHour) {
                 isShopOpen = true;
                 const badgeText = (lang === 'en') ? 'Online' : 'অনলাইন';
-                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> ${badgeText}`;
-                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> ${badgeText}`;
+                statusBadge.className = "px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
                 noticeText.innerText = (lang === 'en') ? CONFIG.notice.en : CONFIG.notice.bn;
             } else {
                 isShopOpen = false;
                 const badgeText = (lang === 'en') ? 'Offline' : 'অফলাইন';
-                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> ${badgeText}`;
-                statusBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> ${badgeText}`;
+                statusBadge.className = "px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
                 const noticeMsg = (lang === 'en') 
                     ? "Sorry! We are currently Offline. Please try between 8 AM to 8 PM."
                     : "দুঃখিত! এখন আমরা অফলাইন। সকাল ৮টা থেকে রাত ৮টা পর্যন্ত চেষ্টা করুন।";
@@ -1093,22 +1100,19 @@
             optionsContainer.innerHTML = '';
 
             methods.forEach(m => {
-                if (isReceive && m.id === 'bkash') {
-                    select.innerHTML += `<option value="${m.id}" disabled>${m.name}</option>`;
-                } else {
-                    select.innerHTML += `<option value="${m.id}">${m.name}</option>`;
-                }
+                // ✅ FIX: Removed the hardcoded disabled block for Bkash here
+                select.innerHTML += `<option value="${m.id}">${m.name}</option>`;
 
-                const isDisabled = (isReceive && m.id === 'bkash') ? 'disabled' : '';
                 const logoHtml = `<img src="${m.logo}" class="w-6 h-6 rounded-full object-contain bg-white p-[2px]" onerror="this.src='https://via.placeholder.com/24?text=${m.name[0]}'">`;
                 
                 const optionDiv = document.createElement('div');
-                optionDiv.className = `custom-option ${isDisabled}`;
+                optionDiv.className = `custom-option`; // Removed disabled class default
                 optionDiv.setAttribute('data-value', m.id);
                 optionDiv.innerHTML = `${logoHtml} <span class="text-sm font-medium text-gray-200">${m.name}</span>`;
                 
                 optionDiv.onclick = function() {
-                    if (isDisabled) return;
+                    // Check if disabled class is present (set dynamically by updateUI)
+                    if (this.classList.contains('disabled')) return;
                     select.value = m.id;
                     select.dispatchEvent(new Event('change'));
                     document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show'));
@@ -1189,16 +1193,15 @@
             const trxLabel = document.getElementById('trxLabel');
             const userTrxInput = document.getElementById('userTrxID');
 
+            // ✅ Logic updated for "Last 4 digits" validation across all methods as requested
+            senderLabel.innerText = (lang === 'en') ? `Sender Last 4 Digits` : `যে নাম্বার থেকে টাকা পাঠিয়েছেন তার শেষ ৪ সংখ্যা`;
+            userNumberInput.placeholder = "xxxx"; 
+            userNumberInput.setAttribute('inputmode', 'numeric');
+            
             if (sendObj.type === 'bdt') {
-                senderLabel.innerText = (lang === 'en') ? `Enter the ${sendObj.name} number/UID from which you sent the money/dollars.` : `আপনি ${sendObj.name} যে নাম্বার থেকে টাকা/ডলার পাঠিয়েছেন সেই Number/UID দিন `;
-                userNumberInput.placeholder = "Example:01xxxxxxxxx";
-                userNumberInput.setAttribute('inputmode', 'numeric');
                 trxLabel.innerText = `${sendObj.name} TrxID`;
                 userTrxInput.placeholder = sendObj.trxHint || "TrxID...";
             } else {
-                senderLabel.innerText = (lang === 'en') ? `Enter the ${sendObj.name} ${sendObj.label} number/UID from which you sent the money/dollars.` : `Enter the ${sendObj.name} ${sendObj.label} number/UID from which you sent the money/dollars.`; 
-                userNumberInput.placeholder = `Last digits`;
-                userNumberInput.setAttribute('inputmode', 'numeric');
                 trxLabel.innerText = `${sendObj.name} ${sendObj.trxType}`; 
                 userTrxInput.placeholder = sendObj.trxHint || "Reference...";
             }
@@ -1221,9 +1224,21 @@
                 receiverInput.removeAttribute('maxlength');
             }
 
+            // ✅ Rocket Number Display Fix (Show 12 digits, copy 11)
             document.getElementById('adminMethodName').innerText = sendObj.name;
-            const accInfo = CONFIG.accounts[sendId];
-            document.getElementById('adminNumberText').innerText = accInfo ? accInfo : "Contact Admin";
+            let accInfo = CONFIG.accounts[sendId];
+            let displayAcc = accInfo ? accInfo : "Contact Admin";
+            
+            // Set the REAL 11 digit number for copying
+            const adminNumEl = document.getElementById('adminNumberText');
+            adminNumEl.setAttribute('data-copy-value', displayAcc);
+            
+            // If Rocket, show extra digit visually
+            if(sendId === 'rocket' && accInfo) {
+                displayAcc = accInfo + "-(8)";
+            }
+            
+            adminNumEl.innerText = displayAcc;
             document.getElementById('adminAccountType').innerText = `(${sendObj.label})`;
 
             validateForm(); 
@@ -1239,9 +1254,11 @@
         }
 
         function calculateValues(amountInput, sendObj, receiveObj) {
-            if (!amountInput || isNaN(amountInput)) return { fee: 0, finalAmount: 0, feeDesc: "" };
+            if (!amountInput || isNaN(amountInput)) return { fee: 0, finalAmount: 0, feeDesc: "", extraSendFee: 0 };
+            
             let totalFee = 0, feeDescription = "";
             let serviceFeeBDT = 0;
+            let extraSendMoneyFee = 0; // 5 Taka logic
 
             // Determine equivalent BDT amount for Service Fee calculation
             let equivalentBDT = amountInput;
@@ -1252,16 +1269,24 @@
             // Get Service Fee based on Tier
             serviceFeeBDT = getServiceFee(equivalentBDT);
 
+            // ✅ LOGIC: Extra 5 Taka Fee for Nagad (Always) & Bkash (>100)
+            if (receiveObj.id === 'nagad') {
+                extraSendMoneyFee = 5;
+            } else if (receiveObj.id === 'bkash' && equivalentBDT > 100) {
+                extraSendMoneyFee = 5;
+            }
+
             if (sendObj.type === 'bdt') {
                 const cashoutRate = CONFIG.cashoutRates[sendObj.id] || 1.85; 
                 const cashoutFee = (amountInput * cashoutRate) / 100;
-                totalFee = cashoutFee + serviceFeeBDT;
+                // Add all fees: Cashout + Service + Extra Send Money
+                totalFee = cashoutFee + serviceFeeBDT + extraSendMoneyFee;
                 feeDescription = `(Cashout ${cashoutRate}% + Service ৳${serviceFeeBDT})`;
             } else {
-                // For USD: Convert Service Fee (BDT) to USD and add to any default platform fee
-                // Assuming no platform % for crypto cashout, just this flat service fee logic
-                const serviceFeeUSD = serviceFeeBDT / CONFIG.rates.bdtToUsd; // Convert TK to USD
-                totalFee = serviceFeeUSD; // Only adding service fee as requested to replace "3%"
+                // For USD: Convert Fees (BDT) to USD
+                const serviceFeeUSD = serviceFeeBDT / CONFIG.rates.bdtToUsd; 
+                const extraSendFeeUSD = extraSendMoneyFee / CONFIG.rates.bdtToUsd;
+                totalFee = serviceFeeUSD + extraSendFeeUSD; 
                 feeDescription = `(Service ৳${serviceFeeBDT})`;
             }
 
@@ -1280,7 +1305,8 @@
                 finalAmount = netAmount * CONFIG.rates.usdToBdt;
                 rateText = `1 USD = ${CONFIG.rates.usdToBdt} BDT (Buy)`;
             }
-            return { fee: totalFee, finalAmount: finalAmount, feeDesc: feeDescription, rateText: rateText };
+            
+            return { fee: totalFee, finalAmount: finalAmount, feeDesc: feeDescription, rateText: rateText, extraSendFee: extraSendMoneyFee };
         }
 
         function validateForm() {
@@ -1345,24 +1371,18 @@
                 showWarning(msg);
             }
 
-            // 3. Sender Validation (Pattern Check)
+            // 3. Sender Validation (STRICT 4 DIGITS)
             if (rawUserNumber.length > 0) {
-                if(rawUserNumber.includes(' ')) {
+                 if (rawUserNumber.length !== 4 || isNaN(rawUserNumber)) {
                     isValid = false;
-                    senderError.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No Space!';
-                    senderError.classList.remove('hidden');
-                    senderInput.classList.add('input-error');
-                }
-                else if (sendObj.senderPattern && !sendObj.senderPattern.test(rawUserNumber)) {
-                    isValid = false;
-                    const err = (lang === 'en') ? 'Invalid Format!' : 'ভুল নাম্বার!';
+                    const err = (lang === 'en') ? 'Last 4 digits only!' : 'শেষ ৪ সংখ্যা দিন!';
                     senderError.innerHTML = `<i class="fa-solid fa-xmark"></i> ${err}`;
                     senderError.classList.remove('hidden');
                     senderInput.classList.add('input-error');
-                }
+                 }
             } else { isValid = false; }
 
-            // 4. TrxID Validation (UPDATED REGEX)
+            // 4. TrxID Validation
             if (rawUserTrxID.length > 0) {
                 if(rawUserTrxID.includes(' ')) {
                      isValid = false;
@@ -1429,6 +1449,8 @@
             const breakdownBox = document.getElementById('calcBreakdown');
             const warningBox = document.getElementById('rangeWarning');
             const warningText = document.getElementById('warningText');
+            const sendFeeRow = document.getElementById('sendFeeRow');
+            const sendFeeDisplay = document.getElementById('sendFeeDisplay');
 
             if (!amount || isNaN(amount)) {
                  breakdownBox.classList.add('hidden');
@@ -1461,6 +1483,18 @@
             document.getElementById('rateDisplay').innerText = result.rateText;
             document.getElementById('feeLabel').innerText = (lang === 'en') ? `Fee ${result.feeDesc}:` : `ফি চার্জ ${result.feeDesc}:`;
             document.getElementById('feeDisplay').innerText = `- ${result.fee.toFixed(2)} ${sendObj.type.toUpperCase()}`;
+            
+            // ✅ Display Extra Send Money Fee if applicable
+            if(result.extraSendFee > 0) {
+                sendFeeRow.classList.remove('hidden');
+                let extraDisplay = (sendObj.type === 'usd') 
+                    ? `${(result.extraSendFee / CONFIG.rates.bdtToUsd).toFixed(2)} USD` 
+                    : `${result.extraSendFee} BDT`;
+                sendFeeDisplay.innerText = `- ${extraDisplay}`;
+            } else {
+                sendFeeRow.classList.add('hidden');
+            }
+
             document.getElementById('receiveAmount').innerText = result.finalAmount.toFixed(2);
             document.getElementById('finalReceiveDisplay').innerText = `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`;
         }
@@ -1567,8 +1601,12 @@ Amount: ${sendAmount}
             }, 500); 
         }
 
+        // ✅ Updated Copy Function to use Data Attribute
         function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId).innerText;
+            const el = document.getElementById(elementId);
+            // Use data-copy-value if available (for Rocket), otherwise innerText
+            const text = el.getAttribute('data-copy-value') || el.innerText;
+            
             const textarea = document.createElement("textarea");
             textarea.value = text;
             document.body.appendChild(textarea);
