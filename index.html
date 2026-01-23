@@ -1417,7 +1417,9 @@
                     receiverError.classList.remove('hidden');
                     receiverInput.classList.add('input-error');
                 }
-                else if (receiveObj.receiverPattern && !receiveObj.receiverPattern.test(receiverVal)) {
+                // ✅ Changed: Validation REMOVED for Dollar (USD) as requested
+                // Only checking if type is 'bdt'. If USD, skip validation.
+                else if (receiveObj.type === 'bdt' && receiveObj.receiverPattern && !receiveObj.receiverPattern.test(receiverVal)) {
                     isValid = false;
                     const err = (lang === 'en') ? 'Invalid ID/Number!' : 'ভুল নাম্বার/ID!';
                     receiverError.innerHTML = `<i class="fa-solid fa-xmark"></i> ${err}`;
