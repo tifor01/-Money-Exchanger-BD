@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Money Exchanger BD</title>
     
-    <!-- PRECONNECT FOR FASTER LOADING -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,10 +193,9 @@
         <div class="blob blob-3 rounded-full"></div>
     </div>
 
-    <!-- CONFIG Section -->
     <script>
         // ✅ তোর দেওয়া নতুন লিংক এখানেও বসিয়ে দিয়েছি
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoOVQIQnlbMtGvylAO-qt84eyomAyKzSuMbJP3oXppeIDcgEUYq_8efqJO-kuZLITDcg/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-oqETI8pdpmwQJYDbEYxxNrDisHC2dg6dx8N0TWpWg-5CSEQpL2sDEXKYg_2ixaCpKw/exec";
 
         let CONFIG = {
             whatsappNumber: "8801307545522",
@@ -250,7 +248,6 @@
         }
     </script>
 
-    <!-- Header (Unchanged) -->
     <header class="glass-panel sticky top-0 z-50 border-b-0">
         <div class="container mx-auto px-4 py-2 md:py-3 flex justify-between items-center">
             <div class="flex items-center gap-2 md:gap-3">
@@ -286,11 +283,9 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 flex-grow z-10">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             
-            <!-- LEFT: Calculator -->
             <div class="lg:col-span-2 space-y-6">
                 <div id="calculatorCard" class="glass-panel rounded-2xl p-1 shadow-2xl relative transition-all duration-500 group">
                     <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-purple-500/20 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
@@ -308,7 +303,6 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-                            <!-- Send -->
                             <div class="space-y-4">
                                 <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
                                     <span class="lang-bn">সেন্ড করবেন (Send)</span>
@@ -334,14 +328,12 @@
                                 <p class="text-[10px] text-gray-400 text-right pr-1" id="minAmountHint">Loading...</p>
                             </div>
 
-                            <!-- Swap -->
                             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[80%] md:-translate-y-1/2 z-20 cursor-pointer" onclick="swapMethods()" title="Swap">
                                 <div class="bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center border border-white/10 shadow-xl shadow-black/50 hover:scale-110 hover:border-emerald-500/50 hover:shadow-emerald-500/20 transition-all duration-300">
                                     <i class="fa-solid fa-shuffle text-white text-lg group-hover:animate-spin"></i>
                                 </div>
                             </div>
 
-                            <!-- Receive -->
                             <div class="space-y-4 mt-6 md:mt-0">
                                 <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
                                     <span class="lang-bn">রিসিভ করবেন (Receive)</span>
@@ -371,7 +363,6 @@
                             </div>
                         </div>
 
-                        <!-- Breakdown -->
                         <div id="calcBreakdown" class="mt-6 bg-white/5 rounded-xl p-4 border border-white/5 text-sm space-y-3 hidden relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                             <div class="flex justify-between items-center relative z-10">
@@ -411,7 +402,6 @@
                             <h2 class="text-5xl font-bold text-white eng-font drop-shadow-md" id="displaySendAmount">0.00</h2>
                         </div>
 
-                        <!-- Payment Info -->
                         <div class="mt-6">
                             <div class="glass-input p-4 rounded-xl relative overflow-hidden">
                                 <h3 class="text-white font-bold mb-3 flex items-center gap-2 text-sm">
@@ -439,7 +429,6 @@
                             </div>
                         </div>
 
-                        <!-- User Inputs -->
                         <div class="mt-6 space-y-5">
                             <h3 class="text-gray-300 font-semibold text-sm border-l-2 border-emerald-500 pl-3">
                                 <span class="lang-bn">আপনার তথ্য দিন</span>
@@ -454,13 +443,11 @@
                                 </div>
                                 <div class="relative">
                                     <label id="trxLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">TrxID</label>
-                                    <!-- UPAY UPDATE: Placeholder dynamically changed via JS -->
                                     <input type="text" id="userTrxID" placeholder="TrxID Here..." class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all uppercase" oninput="validateForm()">
                                     <p id="trxError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
                             </div>
 
-                            <!-- Receiver Info -->
                             <div class="relative">
                                 <label id="receiverLabel" class="block text-emerald-400 text-xs mb-1.5 ml-1 font-bold">যে নাম্বারে টাকা নিবেন</label>
                                 <div class="relative">
@@ -473,8 +460,7 @@
                                 <p class="text-[10px] text-gray-500 mt-1 ml-1" id="receiverHint"></p>
                             </div>
 
-                             <!-- WhatsApp -->
-                            <div class="relative">
+                             <div class="relative">
                                 <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
                                     <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
                                 </label>
@@ -482,7 +468,6 @@
                                 <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
                             </div>
 
-                            <!-- Date & Time -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label class="block text-gray-400 text-xs mb-1.5 ml-1">তারিখ (Date)</label>
@@ -506,7 +491,6 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
                         <button id="submitBtn" onclick="processOrder()" disabled class="relative w-full mt-4 bg-gradient-to-r from-gray-700 to-gray-800 border border-white/10 text-gray-400 font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-all duration-300 cursor-not-allowed overflow-hidden">
                             <span class="lang-bn">অর্ডার কনফার্ম করুন</span>
                             <span class="lang-en hidden">Confirm Order</span>
@@ -516,9 +500,7 @@
                 </div>
             </div>
             
-            <!-- RIGHT: Sidebar -->
             <div class="space-y-6">
-                <!-- Reserve -->
                 <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white">
@@ -544,7 +526,6 @@
                     </div>
                 </div>
 
-                <!-- Transactions -->
                 <div class="glass-panel rounded-2xl p-5 overflow-hidden h-[400px]">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white border-b border-white/10 pb-2">
                         <i class="fa-solid fa-chart-line text-blue-400"></i> 
@@ -557,7 +538,6 @@
                     </div>
                 </div>
 
-                <!-- Rules Updated -->
                 <div class="glass-panel rounded-2xl p-5">
                     <h3 class="font-bold text-sm mb-3 text-gray-300 uppercase tracking-wider">
                         ⚠️ <span class="lang-bn">জরুরি নিয়মাবলী</span><span class="lang-en hidden">Important Rules</span>
@@ -584,7 +564,6 @@
         </div>
     </main>
 
-    <!-- Footer Updated -->
     <footer class="glass-panel border-t border-white/5 py-8 mt-8 z-10 relative">
         <div class="container mx-auto px-4 text-center space-y-4">
             <div class="flex justify-center gap-4">
@@ -596,7 +575,7 @@
                 </a>
             </div>
             <div class="text-gray-500 text-xs tracking-wider space-y-2">
-                <p>&copy; 2026 Money Exchanger BD. All Rights Reserved.</p>
+                <p>© 2026 Money Exchanger BD. All Rights Reserved.</p>
                 <p>
                     <a href="https://wa.me/8801754838532?text=আমিও%20ওয়েবসাইট%20বানাতে%20চাই" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold transition-colors">
                         Website Developed By Tifor
@@ -611,7 +590,6 @@
             </div>
         </footer>
 
-    <!-- Utilities -->
     <canvas id="confetti" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
     <div id="toast" class="fixed top-24 right-5 bg-slate-900/90 border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-x-[200%] transition-transform duration-500 z-[60] backdrop-blur-xl flex items-center gap-3">
@@ -619,7 +597,6 @@
         <span id="toastMsg" class="font-medium text-sm">Message</span>
     </div>
 
-    <!-- Shop Closed Popup -->
     <div id="timePopup" class="fixed inset-0 z-[80] bg-black/95 hidden items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-2xl p-6 text-center animate-modal-pop border border-red-500/30">
             <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -637,7 +614,6 @@
         </div>
     </div>
 
-    <!-- QR Modal -->
     <div id="qrModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="toggleFullQR()">
         <div class="bg-white p-4 rounded-2xl animate-blob transform scale-100 max-w-sm w-full text-center relative">
             <h3 class="text-black font-bold mb-2">Scan to Pay</h3>
@@ -649,7 +625,6 @@
         </div>
     </div>
 
-    <!-- TRACK ORDER MODAL -->
     <div id="trackingModal" class="fixed inset-0 z-[95] bg-black/95 hidden items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-2xl p-6 animate-modal-pop relative">
             <button onclick="toggleTrackingModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
@@ -713,14 +688,13 @@
         </div>
     </div>
 
-    <!-- MAIN LOGIC -->
     <script>
         // ✅ REGEX PATTERNS 
         const patterns = {
             bkash: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10}$/,
             nagad: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8}$/,
             upay: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8,12}$/,
-            rocket: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8,12}$/,
+            rocket: /^[0-9]{8,12}$/, // 👈 CHANGED: Only Numbers Allowed for Rocket
             tallykhata: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6,12}$/,
             binance: /^[0-9]{6,9}$/,
             bitget: /^[0-9]{6,9}$/,
@@ -811,6 +785,7 @@
                 if(data.nagad) CONFIG.accounts.nagad = data.nagad;
                 if(data.rocket) CONFIG.accounts.rocket = data.rocket;
                 if(data.upay) CONFIG.accounts.upay = data.upay;
+                if(data.tallykhata) CONFIG.accounts.tallykhata = data.tallykhata; // 👈 ADDED: TallyKhata Loading
                 if(data.binance_id) CONFIG.accounts.binance = data.binance_id;
                 if(data.bitget_id) CONFIG.accounts.bitget = data.bitget_id;
                 if(data.mexc_id) CONFIG.accounts.mexc = data.mexc_id;
