@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#10B981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk1vbmV5IEV4Y2hhbmdlciBCRCIsCiAgInNob3J0X25hbWUiOiAiTW9uZXlFeGNoYW5nZXIiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBGMTcyQSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMEI5ODEiLAogICJpY29ucyI6IFt7CiAgICAic3JjIjogImh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9naC9hbHh4YWRlcy9mbGFnLWljb25zL2NvdW50cnktNHg0L2JkLnN2ZyIsCiAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogIH1dCn0=">
+    
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000"> 
     <title>Money Exchanger BD</title>
     
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -11,11 +18,15 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
+            darkMode: 'class', // Manual dark mode toggle
             theme: {
                 extend: {
                     fontFamily: {
@@ -34,6 +45,7 @@
                         'blob': 'blob 7s infinite',
                         'modal-pop': 'modalPop 0.3s ease-out forwards',
                         'spin-fast': 'spin 1s linear infinite',
+                        'shimmer': 'shimmer 1.5s infinite linear', // Skeleton animation
                     },
                     keyframes: {
                         float: {
@@ -53,6 +65,10 @@
                         spin: {
                             '0%': { transform: 'rotate(0deg)' },
                             '100%': { transform: 'rotate(360deg)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' }
                         }
                     }
                 }
@@ -61,128 +77,77 @@
     </script>
     <style>
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        :root {
+            --bg-color: #0F172A;
+            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --input-text: #ffffff;
+            --card-bg: #1e293b;
+        }
+
+        /* Light Theme Overrides */
+        body.light-theme {
+            --bg-color: #f0f9ff;
+            --text-color: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+            --input-text: #0f172a;
+            --card-bg: #ffffff;
+        }
+
+        body.light-theme .aurora-bg { opacity: 0.1; }
+        body.light-theme .glass-panel { background: var(--glass-bg); border-color: var(--glass-border); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); }
+        body.light-theme .glass-input { background: var(--input-bg); color: var(--input-text); border-color: #e2e8f0; }
+        body.light-theme .text-white { color: #0f172a !important; } /* Force override text-white */
+        body.light-theme .text-gray-300, body.light-theme .text-gray-400 { color: #475569 !important; }
+        body.light-theme .text-gray-500 { color: #64748b !important; }
+        body.light-theme .bg-slate-900\/80 { background-color: rgba(255,255,255,0.9) !important; }
+        body.light-theme .bg-white\/5 { background-color: rgba(0,0,0,0.05) !important; }
+        body.light-theme .border-white\/10 { border-color: rgba(0,0,0,0.1) !important; }
         
         body { 
             font-family: 'Hind Siliguri', sans-serif; 
-            background-color: #0F172A;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
+
         .eng-font { font-family: 'Inter', sans-serif; }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .glass-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(4px);
-            transition: all 0.2s ease-out; 
-            color-scheme: dark; 
-        }
-        .glass-input:focus {
-            background: rgba(0, 0, 0, 0.5);
-            border-color: #10B981;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-        }
-
-        .custom-select-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .custom-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: #1e293b;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 0.75rem;
-            margin-top: 0.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 50;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            -webkit-overflow-scrolling: touch;
-        }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+        .glass-input { background: var(--input-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(4px); transition: all 0.2s ease-out; color: var(--input-text); }
+        .glass-input:focus { background: rgba(16, 185, 129, 0.1); border-color: #10B981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .custom-select-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; user-select: none; }
+        .custom-options { position: absolute; top: 100%; left: 0; width: 100%; background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 0.75rem; margin-top: 0.5rem; max-height: 300px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .custom-options.show { display: block; animation: fadeIn 0.15s ease-out; }
-        .custom-option {
-            padding: 12px 15px; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.1s;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .custom-option:last-child { border-bottom: none; }
+        .custom-option { padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid var(--glass-border); }
         .custom-option:hover { background: rgba(16, 185, 129, 0.1); }
         .custom-option.selected { background: rgba(16, 185, 129, 0.2); color: #10B981; }
         .custom-option.disabled { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-error {
-            border-color: #ef4444 !important;
-            background-color: rgba(239, 68, 68, 0.1) !important;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
-        }
-
-        .aurora-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-            overflow: hidden;
-            will-change: transform; 
-        }
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: blob 10s infinite alternate;
-            will-change: transform; 
-        }
+        .input-error { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%); overflow: hidden; transition: opacity 0.5s ease; }
+        .blob { position: absolute; filter: blur(80px); opacity: 0.4; animation: blob 10s infinite alternate; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #4f46e5; animation-delay: 0s; }
         .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #10b981; animation-delay: 2s; }
         .blob-3 { bottom: 20%; left: 20%; width: 400px; height: 400px; background: #f59e0b; animation-delay: 4s; }
-
         .ticker-container { height: 300px; overflow: hidden; position: relative; }
-        .ticker-track { animation: scrollUp 20s linear infinite; will-change: transform; }
+        .ticker-track { animation: scrollUp 20s linear infinite; }
         @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        @media (hover: hover) { .ticker-container:hover .ticker-track { animation-play-state: paused; } }
-
-        .qr-scanner-line { animation: scan 2s linear infinite; }
-        @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-
-        #timePopup, #privacyModal, #trackingModal { backdrop-filter: blur(8px); }
-        .time-wrapper { position: relative; }
+        .spinner { border: 2px solid rgba(255, 255, 255, 0.3); border-left-color: #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
         
-        .spinner {
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
+        /* Skeleton Loader */
+        .skeleton { background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; opacity: 0.7; }
+        body.light-theme .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%); }
+
+        /* Chat Widget REMOVED */
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col font-bangla relative selection:bg-emerald-500 selection:text-white">
@@ -194,58 +159,38 @@
     </div>
 
     <script>
-        // ✅ তোর দেওয়া নতুন লিংক এখানেও বসিয়ে দিয়েছি
+        // THEME INIT SCRIPT
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            // Default to LIGHT if not set
+            if (!savedTheme || savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+            }
+        })();
+
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-oqETI8pdpmwQJYDbEYxxNrDisHC2dg6dx8N0TWpWg-5CSEQpL2sDEXKYg_2ixaCpKw/exec";
 
         let CONFIG = {
             whatsappNumber: "8801307545522",
-            // Default times if Admin hasn't set them yet
-            shopOpenTime: "10:00 AM",
-            shopCloseTime: "11:59 PM",
-            shopStatusMsg: "দুঃখিত! এখন আমরা অফলাইন। আগামীকাল সকাল ১০টায় আবার চালু হবে।",
-            
-            maxBDTValue: 2222,
-            minBDTValue: 10,
+            // 🔒 HARDCODED TIME: 8 AM to 8 PM (Will be handled by JS)
+            shopStatusMsg: "দুঃখিত! এখন আমরা অফলাইন। আমাদের সময় সকাল ৮ টা থেকে রাত ৮ টা পর্যন্ত।",
+            maxBDTValue: 2222, minBDTValue: 10,
             reserve: { bdt: "Loading...", usdt: "Loading..." },
-            defaultFeePercentage: 0, 
-            cashoutRates: { bkash: 1.85, nagad: 1.25, rocket: 1.8, upay: 1.4, tallykhata: 1.5 },
-            
-            // Default Global Rates (Fallback)
             rates: { usdToBdt: 125, bdtToUsd: 130 }, 
-            
-            // Specific Rates (Will be loaded from Admin)
             platformRates: {
-                binance: { buy: 130, sell: 125 },
-                bitget: { buy: 130, sell: 125 },
-                mexc: { buy: 130, sell: 125 },
-                redotpay: { buy: 130, sell: 125 }
+                binance: { buy: 130, sell: 125 }, bitget: { buy: 130, sell: 125 },
+                mexc: { buy: 130, sell: 125 }, redotpay: { buy: 130, sell: 125 }
             },
-
             accounts: {
-                bkash: "Loading...", 
-                nagad: "Loading...",
-                upay: "Loading...",
-                rocket: "Loading...",
-                tallykhata: "Loading...",
-                redotpay: "Loading...",
-                bitget: "Loading...",
-                binance: "Loading...", 
-                mexc: "Loading..."
+                bkash: "Loading...", nagad: "Loading...", upay: "Loading...", rocket: "Loading...",
+                tallykhata: "Loading...", redotpay: "Loading...", bitget: "Loading...", binance: "Loading...", mexc: "Loading...",
+                rocket_extra: "8" 
             },
-            notice: {
-                bn: "🌐 ডাটা লোড হচ্ছে...",
-                en: "🌐 Loading..."
+            notice: { bn: "🌐 ডাটা লোড হচ্ছে...", en: "🌐 Loading..." },
+            fees: {
+                slab1: 1.5, slab2: 2.0, slab3: 2.5, slab4: 3.0, slab5: 4.0
             }
         };
-
-        const savedConfig = localStorage.getItem('siteConfig');
-        if(savedConfig) {
-            try {
-                const parsed = JSON.parse(savedConfig);
-                CONFIG = { ...CONFIG, ...parsed }; 
-                console.log("⚡ Loaded from Cache");
-            } catch(e) { console.error("Cache Error", e); }
-        }
     </script>
 
     <header class="glass-panel sticky top-0 z-50 border-b-0">
@@ -255,24 +200,27 @@
                     <i class="fa-solid fa-money-bill-transfer text-white text-sm md:text-xl animate-pulse"></i>
                 </div>
                 <div class="leading-tight">
-                    <h1 class="text-base md:text-2xl font-bold tracking-wide text-white whitespace-nowrap">
-                        Money <span class="text-emerald-400">Exchanger</span> BD
-                    </h1>
+                    <h1 class="text-base md:text-2xl font-bold tracking-wide text-white whitespace-nowrap">Money <span class="text-emerald-400">Exchanger</span> BD</h1>
                     <p class="text-[8px] md:text-[10px] text-emerald-400/80 uppercase tracking-widest font-bold">Fast & Secure</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="toggleTrackingModal(true)" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition-all group shadow-[0_0_10px_rgba(16,185,129,0.2)]" title="Track Order">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group">
+                    <i id="themeIcon" class="fa-solid fa-sun text-yellow-400 text-xs md:text-sm"></i>
+                </button>
+
+                <button onclick="toggleTrackingModal(true)" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition-all group shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                     <i class="fa-solid fa-magnifying-glass text-xs md:text-sm"></i>
                 </button>
-
-                <button onclick="toggleGlobalLanguage()" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group" title="Change Language">
+                <button onclick="toggleGlobalLanguage()" class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-emerald-500/20 border border-white/10 flex items-center justify-center transition-all group">
                     <i class="fa-solid fa-earth-americas text-emerald-400 group-hover:rotate-180 transition-transform duration-500 text-xs md:text-sm"></i>
                 </button>
-
-                <div id="statusBadge" class="px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner whitespace-nowrap">
-                </div>
+                <!-- Install App Button (Hidden initially) -->
+                <button id="installAppBtn" class="hidden px-2 py-1 rounded bg-emerald-500 text-white text-[10px] font-bold"><i class="fa-solid fa-download"></i> App</button>
+                
+                <div id="statusBadge" class="px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner whitespace-nowrap"></div>
             </div>
         </div>
         <div class="bg-gradient-to-r from-emerald-900/40 via-black/40 to-emerald-900/40 text-emerald-100 text-[10px] md:text-xs py-1 border-y border-white/5 backdrop-blur-sm">
@@ -285,44 +233,37 @@
 
     <main class="container mx-auto px-4 py-8 flex-grow z-10">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            
             <div class="lg:col-span-2 space-y-6">
                 <div id="calculatorCard" class="glass-panel rounded-2xl p-1 shadow-2xl relative transition-all duration-500 group">
                     <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-purple-500/20 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000"></div>
-                    
                     <div class="relative bg-slate-900/80 rounded-xl p-6 backdrop-blur-xl">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-2xl font-bold flex items-center gap-2 text-white">
-                                <i class="fa-solid fa-arrow-right-arrow-left text-emerald-400"></i> 
-                                <span class="lang-bn">এক্সচেঞ্জ জোন</span>
-                                <span class="lang-en hidden eng-font">Exchange Zone</span>
+                                <i class="fa-solid fa-arrow-right-arrow-left text-emerald-400"></i> <span class="lang-bn">এক্সচেঞ্জ জোন</span><span class="lang-en hidden eng-font">Exchange Zone</span>
                             </h2>
-                            <span class="text-xs text-gray-400 border border-white/10 px-2 py-1 rounded bg-white/5">
-                                <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure P2P
-                            </span>
+                            <span class="text-xs text-gray-400 border border-white/10 px-2 py-1 rounded bg-white/5"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure P2P</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+                        <!-- Skeleton Loader Container -->
+                        <div id="mainSkeleton" class="space-y-4 hidden">
+                            <div class="h-12 w-full skeleton"></div>
+                            <div class="h-20 w-full skeleton"></div>
+                            <div class="h-12 w-full skeleton"></div>
+                        </div>
+
+                        <div id="calculatorContent" class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
                             <div class="space-y-4">
-                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
-                                    <span class="lang-bn">সেন্ড করবেন (Send)</span>
-                                    <span class="lang-en hidden">You Send</span>
-                                </label>
-                                
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1"><span class="lang-bn">সেন্ড করবেন (Send)</span><span class="lang-en hidden">You Send</span></label>
                                 <div class="relative" id="sendDropdownContainer">
                                     <select id="sendMethod" class="hidden" onchange="updateUI()"></select> 
-                                    
                                     <div class="glass-input text-white rounded-xl p-3 custom-select-btn touch-manipulation" onclick="toggleDropdown('sendOptions')">
                                         <div class="flex items-center gap-3" id="sendSelectedDisplay"></div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                                     </div>
                                     <div id="sendOptions" class="custom-options glass-panel"></div>
                                 </div>
-
                                 <div class="relative group mt-2">
-                                    <input type="number" id="sendAmount" placeholder="0.00" inputmode="decimal" 
-                                           oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4); validateForm()" 
-                                           class="w-full glass-input text-emerald-400 text-2xl font-bold rounded-xl px-4 py-4 eng-font focus:outline-none placeholder-gray-600 transition-colors">
+                                    <input type="number" id="sendAmount" placeholder="0.00" inputmode="decimal" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4); validateForm()" class="w-full glass-input text-emerald-400 text-2xl font-bold rounded-xl px-4 py-4 eng-font focus:outline-none placeholder-gray-600 transition-colors">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold eng-font bg-white/5 px-2 py-1 rounded" id="sendCurrency">BDT</span>
                                 </div>
                                 <p class="text-[10px] text-gray-400 text-right pr-1" id="minAmountHint">Loading...</p>
@@ -335,26 +276,17 @@
                             </div>
 
                             <div class="space-y-4 mt-6 md:mt-0">
-                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
-                                    <span class="lang-bn">রিসিভ করবেন (Receive)</span>
-                                    <span class="lang-en hidden">You Receive</span>
-                                </label>
-                                
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1"><span class="lang-bn">রিসিভ করবেন (Receive)</span><span class="lang-en hidden">You Receive</span></label>
                                 <div class="relative" id="receiveDropdownContainer">
                                     <select id="receiveMethod" class="hidden" onchange="updateUI()"></select>
-                                    
                                     <div class="glass-input text-white rounded-xl p-3 custom-select-btn touch-manipulation" onclick="toggleDropdown('receiveOptions')">
                                         <div class="flex items-center gap-3" id="receiveSelectedDisplay"></div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                                     </div>
                                     <div id="receiveOptions" class="custom-options glass-panel"></div>
                                 </div>
-
                                 <div class="glass-input rounded-xl px-4 py-4 flex flex-col justify-center min-h-[76px] mt-2">
-                                    <span class="text-[10px] text-gray-400 mb-1">
-                                        <span class="lang-bn">পাবেন (Net Amount):</span>
-                                        <span class="lang-en hidden">You Get (Net):</span>
-                                    </span>
+                                    <span class="text-[10px] text-gray-400 mb-1"><span class="lang-bn">পাবেন (Net Amount):</span><span class="lang-en hidden">You Get (Net):</span></span>
                                     <div class="flex justify-between items-end">
                                         <span id="receiveAmount" class="text-2xl font-bold text-white eng-font drop-shadow-md">0.00</span>
                                         <span id="receiveCurrency" class="text-xs font-bold text-emerald-400 eng-font bg-emerald-400/10 px-2 py-1 rounded">USD</span>
@@ -364,17 +296,16 @@
                         </div>
 
                         <div id="calcBreakdown" class="mt-6 bg-white/5 rounded-xl p-4 border border-white/5 text-sm space-y-3 hidden relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                             <div class="flex justify-between items-center relative z-10">
-                                <span class="text-gray-400">
-                                    <span class="lang-bn">এক্সচেঞ্জ রেট:</span>
-                                    <span class="lang-en hidden">Exchange Rate:</span>
-                                </span>
+                                <span class="text-gray-400"><span class="lang-bn">এক্সচেঞ্জ রেট:</span><span class="lang-en hidden">Exchange Rate:</span></span>
                                 <span id="rateDisplay" class="text-white font-medium eng-font bg-black/20 px-2 py-0.5 rounded">-</span>
                             </div>
-                            <div class="flex justify-between items-center text-red-300 font-medium relative z-10">
-                                <span id="feeLabel">ফি:</span>
-                                <span id="feeDisplay" class="eng-font">- 0.00</span>
+                            <div class="flex flex-col text-red-300 font-medium relative z-10">
+                                <div class="flex justify-between items-center">
+                                    <span>Fee Breakdown:</span>
+                                    <span id="feeDisplay" class="eng-font">- 0.00</span>
+                                </div>
+                                <span id="feeLabel" class="text-[10px] text-gray-400 text-right mt-1 block"></span>
                             </div>
                             <div id="sendFeeRow" class="flex justify-between items-center text-orange-300 font-medium relative z-10 hidden">
                                 <span class="lang-bn">সেন্ড মানি খরচ:</span><span class="lang-en hidden">Send Money Fee:</span>
@@ -382,10 +313,7 @@
                             </div>
 
                             <div class="border-t border-white/10 pt-2 flex justify-between text-white font-bold text-lg relative z-10">
-                                <span>
-                                    <span class="lang-bn">মোট পাবেন:</span>
-                                    <span class="lang-en hidden">Total Receive:</span>
-                                </span>
+                                <span><span class="lang-bn">মোট পাবেন:</span><span class="lang-en hidden">Total Receive:</span></span>
                                 <span id="finalReceiveDisplay" class="eng-font text-emerald-400">0.00</span>
                             </div>
                         </div>
@@ -395,30 +323,20 @@
                         </div>
 
                         <div id="dynamicSendPreview" class="mt-6 bg-emerald-600 border border-emerald-400 rounded-xl p-6 text-center hidden animate-pulse transition-all shadow-lg shadow-emerald-500/20">
-                            <p class="text-xs text-emerald-100 mb-1 font-bold uppercase tracking-widest">
-                                <span class="lang-bn">মোট টাকা পাঠাতে হবে (Send Amount)</span>
-                                <span class="lang-en hidden">Total Send Amount</span>
-                            </p>
+                            <p class="text-xs text-emerald-100 mb-1 font-bold uppercase tracking-widest"><span class="lang-bn">মোট টাকা পাঠাতে হবে (Send Amount)</span><span class="lang-en hidden">Total Send Amount</span></p>
                             <h2 class="text-5xl font-bold text-white eng-font drop-shadow-md" id="displaySendAmount">0.00</h2>
                         </div>
 
                         <div class="mt-6">
                             <div class="glass-input p-4 rounded-xl relative overflow-hidden">
-                                <h3 class="text-white font-bold mb-3 flex items-center gap-2 text-sm">
-                                    <i class="fa-solid fa-paper-plane text-blue-400"></i> 
-                                    <span class="lang-bn">পেমেন্ট পাঠান এখানে</span>
-                                    <span class="lang-en hidden">Send Payment Here</span>
-                                </h3>
-                                
+                                <h3 class="text-white font-bold mb-3 flex items-center gap-2 text-sm"><i class="fa-solid fa-paper-plane text-blue-400"></i> <span class="lang-bn">পেমেন্ট পাঠান এখানে</span><span class="lang-en hidden">Send Payment Here</span></h3>
                                 <div class="flex flex-col md:flex-row gap-4 items-center">
                                     <div class="flex-1 w-full bg-black/30 p-3 rounded-lg border border-white/10 flex justify-between items-center">
                                         <div>
                                             <p id="adminMethodName" class="text-[10px] text-gray-400 font-bold uppercase mb-1">BKASH</p>
                                             <p class="text-lg font-bold text-white eng-font tracking-wider"><span id="adminNumberText" data-copy-value="">Loading...</span> <span id="adminAccountType" class="text-[10px] font-normal text-emerald-400 bg-emerald-400/10 px-1 rounded ml-1"></span></p>
                                         </div>
-                                        <button onclick="copyToClipboard('adminNumberText')" class="bg-white/10 hover:bg-white/20 text-white w-8 h-8 rounded flex items-center justify-center transition-colors">
-                                            <i class="fa-regular fa-copy"></i>
-                                        </button>
+                                        <button onclick="copyToClipboard('adminNumberText')" class="bg-white/10 hover:bg-white/20 text-white w-8 h-8 rounded flex items-center justify-center transition-colors"><i class="fa-regular fa-copy"></i></button>
                                     </div>
                                     <div id="qrCodeContainer" class="hidden">
                                         <div class="w-12 h-12 bg-white p-1 rounded cursor-pointer hover:scale-110 transition-transform" onclick="toggleFullQR()">
@@ -430,14 +348,10 @@
                         </div>
 
                         <div class="mt-6 space-y-5">
-                            <h3 class="text-gray-300 font-semibold text-sm border-l-2 border-emerald-500 pl-3">
-                                <span class="lang-bn">আপনার তথ্য দিন</span>
-                                <span class="lang-en hidden">Your Information</span>
-                            </h3>
-                            
+                            <h3 class="text-gray-300 font-semibold text-sm border-l-2 border-emerald-500 pl-3"><span class="lang-bn">আপনার তথ্য দিন</span><span class="lang-en hidden">Your Information</span></h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
-                                    <label id="senderLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">সেন্ডার নাম্বার</label>
+                                    <label id="senderLabel" class="block text-gray-400 text-xs mb-1.5 ml-1">সেন্ডার নাম্বার/UID শেষের ৪ টা ডিজিট</label>
                                     <input type="text" id="userNumber" placeholder="xxxx" inputmode="numeric" maxlength="4" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all text-center tracking-widest text-lg font-bold">
                                     <p id="senderError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
@@ -447,54 +361,41 @@
                                     <p id="trxError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল!</p>
                                 </div>
                             </div>
-
                             <div class="relative">
                                 <label id="receiverLabel" class="block text-emerald-400 text-xs mb-1.5 ml-1 font-bold">যে নাম্বারে টাকা নিবেন</label>
                                 <div class="relative">
                                     <input type="text" id="receiverDetails" placeholder="রিসিভার ডিটেইলস..." class="w-full glass-input border-emerald-500/30 text-white rounded-xl px-4 py-3 eng-font focus:border-emerald-500 focus:outline-none text-sm transition-all pl-10" oninput="validateForm()">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa-solid fa-bullseye text-emerald-500"></i>
-                                    </div>
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-bullseye text-emerald-500"></i></div>
                                 </div>
                                 <p id="receiverError" class="text-[10px] text-red-400 mt-1 hidden"></p>
                                 <p class="text-[10px] text-gray-500 mt-1 ml-1" id="receiverHint"></p>
                             </div>
-
                              <div class="relative">
-                                <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2">
-                                    <i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার
-                                </label>
+                                <label class="block text-gray-400 text-xs mb-1.5 ml-1 font-bold flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-400"></i> আপনার WhatsApp নাম্বার</label>
                                 <input type="tel" id="userWhatsapp" placeholder="01xxxxxxxxx" inputmode="numeric" maxlength="11" oninput="if(this.value.length > 11) this.value = this.value.slice(0, 11); validateForm()" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all">
                                 <p id="whatsappError" class="text-[10px] text-red-400 mt-1 absolute right-1 top-0 hidden"><i class="fa-solid fa-circle-xmark"></i> ভুল নাম্বার!</p>
                             </div>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="relative">
                                     <label class="block text-gray-400 text-xs mb-1.5 ml-1">তারিখ (Date)</label>
                                     <input type="date" id="userDate" class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
                                 </div>
                                 <div class="relative">
-                                    <label class="block text-gray-400 text-xs mb-1.5 ml-1">সময় (Time)</label>
+                                    <label class="block text-gray-400 text-xs mb-1.5 ml-1">তারিখ (Time)</label>
                                     <div class="flex gap-2">
                                         <input type="number" id="userHour" placeholder="HH" min="1" max="12" inputmode="numeric" class="w-1/3 glass-input text-white text-center rounded-xl px-2 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
                                         <input type="number" id="userMin" placeholder="MM" min="0" max="59" inputmode="numeric" class="w-1/3 glass-input text-white text-center rounded-xl px-2 py-3 eng-font focus:outline-none text-sm transition-all" oninput="validateForm()">
                                         <select id="userAmPm" class="w-1/3 glass-input text-white text-center rounded-xl px-1 py-3 eng-font focus:outline-none text-sm transition-all cursor-pointer bg-slate-800" onchange="validateForm()">
-                                            <option value="AM">AM</option>
-                                            <option value="PM">PM</option>
+                                            <option value="AM">AM</option><option value="PM">PM</option>
                                         </select>
                                     </div>
-                                    <p class="text-[10px] text-red-300 mt-1 ml-1 flex items-start gap-1 leading-tight">
-                                        <i class="fa-solid fa-info-circle text-red-400 mt-0.5"></i>
-                                        <span>যেই সময়ে আপনার একাউন্ট থেকে আমাদেরকে টাকা পাঠিয়েছেন।</span>
-                                    </p>
+                                    <p class="text-[10px] text-red-300 mt-1 ml-1 flex items-start gap-1 leading-tight"><i class="fa-solid fa-info-circle text-red-400 mt-0.5"></i><span>যেই সময়ে আপনার একাউন্ট থেকে আমাদেরকে টাকা পাঠিয়েছেন।</span></p>
                                 </div>
                             </div>
                         </div>
 
                         <button id="submitBtn" onclick="processOrder()" disabled class="relative w-full mt-4 bg-gradient-to-r from-gray-700 to-gray-800 border border-white/10 text-gray-400 font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 text-lg transition-all duration-300 cursor-not-allowed overflow-hidden">
-                            <span class="lang-bn">অর্ডার কনফার্ম করুন</span>
-                            <span class="lang-en hidden">Confirm Order</span>
-                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            <span class="lang-bn">অর্ডার কনফার্ম করুন</span><span class="lang-en hidden">Confirm Order</span><i class="fa-brands fa-whatsapp text-2xl"></i>
                         </button>
                     </div>
                 </div>
@@ -503,187 +404,167 @@
             <div class="space-y-6">
                 <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white">
-                        <i class="fa-solid fa-vault text-emerald-400"></i> 
-                        <span class="lang-bn">লাইভ রিজার্ভ</span>
-                        <span class="lang-en hidden">Live Reserve</span>
-                    </h3>
-                    <div class="space-y-3 relative z-10">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white"><i class="fa-solid fa-vault text-emerald-400"></i> <span class="lang-bn">লাইভ রিজার্ভ</span><span class="lang-en hidden">Live Reserve</span></h3>
+                    
+                    <!-- Skeleton -->
+                    <div id="reserveSkeleton" class="space-y-3 hidden">
+                        <div class="h-12 w-full skeleton"></div>
+                        <div class="h-12 w-full skeleton"></div>
+                    </div>
+
+                    <div id="reserveContent" class="space-y-3 relative z-10">
                         <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-colors">
-                            <div class="flex items-center gap-2">
-                                <img src="https://flagcdn.com/w40/bd.png" class="w-6 h-6 rounded-full" alt="BD" loading="lazy">
-                                <span class="text-gray-300 text-sm">BDT (Fiat)</span>
-                            </div>
+                            <div class="flex items-center gap-2"><img src="https://flagcdn.com/w40/bd.png" class="w-6 h-6 rounded-full" alt="BD"><span class="text-gray-300 text-sm">BDT (Fiat)</span></div>
                             <span class="text-emerald-400 font-bold eng-font" id="reserveBDT">Loading...</span>
                         </div>
                         <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg border border-white/5 hover:border-amber-500/30 transition-colors">
-                            <div class="flex items-center gap-2">
-                                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-6 h-6 rounded-full" alt="USDT" loading="lazy">
-                                <span class="text-gray-300 text-sm">USDT (Crypto)</span>
-                            </div>
+                            <div class="flex items-center gap-2"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-6 h-6 rounded-full" alt="USDT"><span class="text-gray-300 text-sm">USDT (Crypto)</span></div>
                             <span class="text-amber-400 font-bold eng-font" id="reserveUSDT">Loading...</span>
                         </div>
                     </div>
                 </div>
-
                 <div class="glass-panel rounded-2xl p-5 overflow-hidden h-[400px]">
-                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white border-b border-white/10 pb-2">
-                        <i class="fa-solid fa-chart-line text-blue-400"></i> 
-                        <span class="lang-bn">সাম্প্রতিক লেনদেন</span>
-                        <span class="lang-en hidden">Recent Transactions</span>
-                    </h3>
-                    <div class="ticker-container">
-                        <div id="transactionList" class="ticker-track space-y-3"></div>
-                        <div id="transactionListClone" class="ticker-track space-y-3 mt-3"></div>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-5">
-                    <h3 class="font-bold text-sm mb-3 text-gray-300 uppercase tracking-wider">
-                        ⚠️ <span class="lang-bn">জরুরি নিয়মাবলী</span><span class="lang-en hidden">Important Rules</span>
-                    </h3>
-                    <ul class="text-xs text-gray-400 space-y-2 list-none">
-                        <li class="flex gap-2">
-                            <i class="fa-solid fa-check text-emerald-500"></i> 
-                            <span class="lang-bn">মিনিমাম ১০ টাকা, সর্বোচ্চ ২২২২ টাকা।</span>
-                            <span class="lang-en hidden">Min 10 BDT, Max 2222 BDT.</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <i class="fa-solid fa-check text-emerald-500"></i> 
-                            <span class="lang-bn">TrxID অবশ্যই ইংরেজিতে লিখবেন।</span>
-                            <span class="lang-en hidden">Write TrxID in English.</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <i class="fa-solid fa-check text-emerald-500"></i> 
-                            <span class="lang-bn">ভুল নাম্বারে টাকা পাঠালে আমরা দায়ী নই।</span>
-                            <span class="lang-en hidden">We are not liable for wrong number transfers.</span>
-                        </li>
-                    </ul>
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white border-b border-white/10 pb-2"><i class="fa-solid fa-chart-line text-blue-400"></i> <span class="lang-bn">সাম্প্রতিক লেনদেন</span><span class="lang-en hidden">Recent Transactions</span></h3>
+                    <div class="ticker-container"><div id="transactionList" class="ticker-track space-y-3"></div><div id="transactionListClone" class="ticker-track space-y-3 mt-3"></div></div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Chat Widget REMOVED Completely as per request -->
+
     <footer class="glass-panel border-t border-white/5 py-8 mt-8 z-10 relative">
         <div class="container mx-auto px-4 text-center space-y-4">
             <div class="flex justify-center gap-4">
-                <a href="https://wa.me/8801307545522" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white flex items-center justify-center transition-all">
-                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                </a>
-                <a href="https://t.me/mexbdofficialchannel2026" target="_blank" class="w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white flex items-center justify-center transition-all">
-                    <i class="fa-brands fa-telegram text-xl"></i>
-                </a>
+                <a href="https://wa.me/8801307545522" target="_blank" class="w-10 h-10 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white flex items-center justify-center transition-all"><i class="fa-brands fa-whatsapp text-xl"></i></a>
+                <a href="https://t.me/mexbdofficialchannel2026" target="_blank" class="w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white flex items-center justify-center transition-all"><i class="fa-brands fa-telegram text-xl"></i></a>
             </div>
             <div class="text-gray-500 text-xs tracking-wider space-y-2">
                 <p>© 2026 Money Exchanger BD. All Rights Reserved.</p>
-                <p>
-                    <a href="https://wa.me/8801754838532?text=আমিও%20ওয়েবসাইট%20বানাতে%20চাই" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold transition-colors">
-                        Website Developed By Tifor
-                    </a>
-                </p>
-                <p>
-                    <a href="javascript:void(0)" onclick="togglePrivacy(true)" class="text-emerald-500 hover:underline">
-                        <span class="lang-bn">প্রাইভেসি পলিসি</span>
-                        <span class="lang-en hidden">Privacy Policy</span>
-                    </a>
-                </p>
+                <button onclick="togglePrivacyModal(true)" class="text-gray-400 hover:text-white underline text-[10px]">Privacy Policy & Terms</button>
+                <p><a href="https://wa.me/8801754838532?text=আমিও%20ওয়েবসাইট%20বানাতে%20চাই" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold transition-colors">Website Developed By Tifor</a></p>
             </div>
-        </footer>
+        </div>
+    </footer>
 
     <canvas id="confetti" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
+    <div id="toast" class="fixed top-24 right-5 bg-slate-900/90 border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-x-[200%] transition-transform duration-500 z-[60] backdrop-blur-xl flex items-center gap-3"><div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10"></div><span id="toastMsg" class="font-medium text-sm">Message</span></div>
 
-    <div id="toast" class="fixed top-24 right-5 bg-slate-900/90 border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-x-[200%] transition-transform duration-500 z-[60] backdrop-blur-xl flex items-center gap-3">
-        <div id="toastIcon" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/10"></div>
-        <span id="toastMsg" class="font-medium text-sm">Message</span>
+    <!-- Modals -->
+    <!-- Privacy Modal Updated with Professional Dual Language Content -->
+    <div id="privacyModal" class="fixed inset-0 z-[120] bg-black/95 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 overflow-y-auto max-h-[80vh] relative animate-modal-pop border border-slate-700">
+            <button onclick="togglePrivacyModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-emerald-400 mb-4 border-b border-white/10 pb-2">
+                <span class="lang-bn">গোপনীয়তা নীতি ও শর্তাবলী</span>
+                <span class="lang-en hidden">Privacy Policy & Terms</span>
+            </h2>
+            <div class="bg-red-500/10 border border-red-500/30 p-3 rounded-lg mb-4 text-xs text-red-200">
+                <i class="fa-solid fa-scale-balanced mr-1"></i> 
+                <span class="lang-bn">এই প্ল্যাটফর্ম বাংলাদেশের প্রচলিত আর্থিক আইন মেনে চলে।</span>
+                <span class="lang-en hidden">This platform operates under Bangladesh financial laws.</span>
+            </div>
+            
+            <!-- Bangla Content -->
+            <div class="lang-bn space-y-4 text-xs text-gray-300 leading-relaxed font-bangla">
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">১. সেবার ধরন ও সম্মতি</h3>
+                    <p>আমরা একটি পিয়ার-টু-পিয়ার (P2P) ফ্রিল্যান্স কারেন্সি এক্সচেঞ্জ সার্ভিস প্রদান করি। আমরা কোনো ব্যাংক নই। মানি লন্ডারিং, অবৈধ জুয়া বা সন্ত্রাসে অর্থায়ন কঠোরভাবে নিষিদ্ধ। কোনো সন্দেহজনক লেনদেন হলে আমরা আইনানুগ ব্যবস্থা নেবো।</p>
+                </div>
+                
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">২. তথ্য সুরক্ষা ও নিরাপত্তা</h3>
+                    <p>আপনার ফোন নম্বর এবং TrxID শুধুমাত্র লেনদেন যাচাই করার জন্য সংরক্ষণ করা হয়। আমরা আপনার তথ্য তৃতীয় কোনো পক্ষের কাছে বিক্রি করি না। সকল তথ্য নিরাপদ HTTPS এনক্রিপশনের মাধ্যমে প্রসেস করা হয়।</p>
+                </div>
+
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">৩. রিফান্ড পলিসি</h3>
+                    <p>যদি আমাদের সিস্টেমের কোনো ত্রুটির কারণে ২৪ ঘন্টার মধ্যে অর্ডার সম্পন্ন না হয়, তবে আপনার টাকা ফেরত দেওয়া হবে। কিন্তু আপনি যদি ভুল নাম্বারে টাকা পাঠান বা ভুল তথ্য দেন, তবে তার দায়ভার আমরা নেবো না এবং রিফান্ড হবে না।</p>
+                </div>
+
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">৪. ব্যবহারকারীর দায়িত্ব</h3>
+                    <p>টাকা পাঠানোর আগে অবশ্যই "সেন্ড মানি" নাম্বারটি চেক করে নিন। আমাদের নাম্বার যেকোনো সময় পরিবর্তন হতে পারে। পুরাতন বা ভুল নাম্বারে টাকা পাঠালে আমরা দায়ী থাকবো না।</p>
+                </div>
+                <p class="text-[10px] text-center opacity-50 mt-4">সর্বশেষ আপডেট: জানুয়ারি ২০২৬</p>
+            </div>
+
+            <!-- English Content -->
+            <div class="lang-en hidden space-y-4 text-xs text-gray-300 leading-relaxed font-english">
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">1. Service Nature & Compliance</h3>
+                    <p>We provide a Peer-to-Peer (P2P) freelance currency exchange service. We are <strong>NOT</strong> a bank. We strictly prohibit money laundering, illegal gambling, or funding terror activities. Any suspicious transaction will be reported to authorities.</p>
+                </div>
+                
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">2. Data Privacy & Security</h3>
+                    <p>Your Phone Number and TrxID are stored <strong>ONLY</strong> for transaction verification purposes. We do not sell your data to third parties. All data is processed via secure HTTPS encryption.</p>
+                </div>
+
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">3. Refund Policy</h3>
+                    <p>If we fail to complete your order within 24 hours due to our system fault, a full refund will be issued to your original payment method. User errors (wrong number given) are not eligible for refunds once processed.</p>
+                </div>
+
+                <div class="p-3 bg-white/5 rounded-lg">
+                    <h3 class="font-bold text-emerald-400 mb-2">4. User Responsibility</h3>
+                    <p>Users must verify the "Send To" number before every transaction. Admin numbers may change anytime. We are not responsible if you send money to an old or wrong number.</p>
+                </div>
+                <p class="text-[10px] text-center opacity-50 mt-4">Last Updated: Jan 2026</p>
+            </div>
+        </div>
     </div>
 
     <div id="timePopup" class="fixed inset-0 z-[80] bg-black/95 hidden items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-2xl p-6 text-center animate-modal-pop border border-red-500/30">
-            <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <i class="fa-solid fa-store-slash text-red-500 text-2xl"></i>
-            </div>
+            <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse"><i class="fa-solid fa-store-slash text-red-500 text-2xl"></i></div>
             <h3 class="text-xl font-bold text-white mb-2">দোকান বন্ধ আছে!</h3>
             <p class="text-gray-400 text-sm mb-4" id="closedMsgText">দুঃখিত! এখন আমাদের কার্যক্রম বন্ধ। অনুগ্রহ করে খোলার সময় পর্যন্ত অপেক্ষা করুন।</p>
-            <div class="text-xs bg-white/5 rounded-lg p-3 text-emerald-400 font-mono mb-4 border border-white/5">
-                <p>Open: <span id="shopOpenTimeDisplay">10:00 AM</span></p>
-                <p>Close: <span id="shopCloseTimeDisplay">11:00 PM</span></p>
-            </div>
-            <button onclick="document.getElementById('timePopup').classList.remove('flex'); document.getElementById('timePopup').classList.add('hidden');" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full text-sm transition-colors">
-                Close
-            </button>
+            <div class="text-xs bg-white/5 rounded-lg p-3 text-emerald-400 font-mono mb-4 border border-white/5"><p>Open: <span id="shopOpenTimeDisplay">08:00 AM</span></p><p>Close: <span id="shopCloseTimeDisplay">08:00 PM</span></p></div>
+            <button onclick="document.getElementById('timePopup').classList.remove('flex'); document.getElementById('timePopup').classList.add('hidden');" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full text-sm transition-colors">Close</button>
         </div>
     </div>
 
     <div id="qrModal" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="toggleFullQR()">
         <div class="bg-white p-4 rounded-2xl animate-blob transform scale-100 max-w-sm w-full text-center relative">
             <h3 class="text-black font-bold mb-2">Scan to Pay</h3>
-            <div class="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                <div class="absolute w-full h-1 bg-red-500 qr-scanner-line top-0 shadow-[0_0_10px_red]"></div>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DemoAddress" class="w-full h-full object-contain p-2">
-            </div>
+            <div class="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden"><div class="absolute w-full h-1 bg-red-500 qr-scanner-line top-0 shadow-[0_0_10px_red]"></div><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DemoAddress" class="w-full h-full object-contain p-2"></div>
             <p class="text-xs text-gray-500 mt-2">Tap anywhere to close</p>
         </div>
     </div>
 
     <div id="trackingModal" class="fixed inset-0 z-[95] bg-black/95 hidden items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-2xl p-6 animate-modal-pop relative">
-            <button onclick="toggleTrackingModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <i class="fa-solid fa-magnifying-glass text-emerald-400"></i>
-                <span class="lang-bn">অর্ডার ট্র্যাক করুন</span>
-                <span class="lang-en hidden">Track Order</span>
-            </h2>
-
+            <button onclick="toggleTrackingModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-magnifying-glass text-emerald-400"></i> <span class="lang-bn">অর্ডার ট্র্যাক করুন</span><span class="lang-en hidden">Track Order</span></h2>
             <div class="space-y-4">
-                <div class="relative">
-                    <input type="text" id="trackTrxInput" placeholder="Enter your TrxID..." class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none uppercase">
-                    
-                    <button onclick="trackOrder()" id="trackBtn" class="absolute right-2 top-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2">
-                        <span>Check</span>
-                        <div id="btnSpinner" class="spinner hidden"></div>
-                    </button>
-                </div>
-
-                <div id="trackLoading" class="hidden text-center py-4">
-                    <i class="fa-solid fa-circle-notch fa-spin text-emerald-400 text-2xl"></i>
-                </div>
-
+                <div class="relative"><input type="text" id="trackTrxInput" placeholder="Enter your TrxID..." class="w-full glass-input text-white rounded-xl px-4 py-3 eng-font focus:outline-none uppercase"><button onclick="trackOrder()" id="trackBtn" class="absolute right-2 top-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-2"><span>Check</span><div id="btnSpinner" class="spinner hidden"></div></button></div>
+                <div id="trackLoading" class="hidden text-center py-4"><i class="fa-solid fa-circle-notch fa-spin text-emerald-400 text-2xl"></i></div>
                 <div id="trackResult" class="hidden mt-4 space-y-3">
-                    <div class="flex justify-center">
-                        <span id="trackStatusBadge" class="px-4 py-1 rounded-full text-xs font-bold uppercase"></span>
-                    </div>
-                    
+                    <div class="flex justify-center"><span id="trackStatusBadge" class="px-4 py-1 rounded-full text-xs font-bold uppercase"></span></div>
                     <div class="bg-white/5 rounded-xl p-4 space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Date/Time:</span>
-                            <span id="trackTime" class="text-white eng-font text-xs"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">TrxID:</span>
-                            <span id="trackTrxIdDisplay" class="text-white eng-font select-all"></span>
-                        </div>
-                        <div class="flex justify-between hidden" id="trackSenderRow">
-                             <span class="text-gray-400">Sender ID:</span>
-                             <span id="trackSender" class="text-white eng-font"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Amount Sent:</span>
-                            <span id="trackAmountIn" class="text-white eng-font"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Amount Get:</span>
-                            <span id="trackAmountOut" class="text-white eng-font"></span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-400">Date/Time:</span><span id="trackTime" class="text-white eng-font text-xs"></span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">TrxID:</span><span id="trackTrxIdDisplay" class="text-white eng-font select-all"></span></div>
+                        <div class="flex justify-between hidden" id="trackSenderRow"><span class="text-gray-400">Sender ID:</span><span id="trackSender" class="text-white eng-font"></span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Amount Sent:</span><span id="trackAmountIn" class="text-white eng-font"></span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Amount Get:</span><span id="trackAmountOut" class="text-white eng-font"></span></div>
                     </div>
-
-                    <div id="trackReasonBox" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
-                        <p class="text-xs text-red-300 mb-1 uppercase font-bold">Reason / কারণ</p>
-                        <p id="trackReasonText" class="text-white font-medium"></p>
-                    </div>
+                    <div id="trackReasonBox" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center"><p class="text-xs text-red-300 mb-1 uppercase font-bold">Reason / কারণ</p><p id="trackReasonText" class="text-white font-medium"></p></div>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Receipt Download Modal (NO CLOSE BUTTON, NO BACKDROP CLICK) -->
+    <div id="receiptModal" class="fixed inset-0 z-[110] bg-black/95 hidden items-center justify-center p-4">
+        <!-- Removed pointer-events-none from inner div to make button clickable, but outer remains blocking -->
+        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 text-center animate-modal-pop relative">
+            <!-- CLOSE BUTTON REMOVED -->
+            <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-file-invoice-dollar text-emerald-500 text-2xl"></i></div>
+            <h3 class="text-xl font-bold text-white mb-2">Order Ready!</h3>
+            <p class="text-gray-400 text-sm mb-6">Please download receipt to complete order.</p>
+            <div class="space-y-3">
+                <button onclick="generateReceipt()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> Download & Send</button>
             </div>
         </div>
     </div>
@@ -691,189 +572,307 @@
     <script>
         // ✅ REGEX PATTERNS 
         const patterns = {
-            bkash: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10}$/,
-            nagad: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8}$/,
-            upay: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8,12}$/,
-            rocket: /^[0-9]{8,12}$/, // 👈 CHANGED: Only Numbers Allowed for Rocket
-            tallykhata: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6,12}$/,
-            binance: /^[0-9]{6,9}$/,
-            bitget: /^[0-9]{6,9}$/,
-            mexc: /^[0-9]{6,9}$/,
-            redotpay: /^REDOT[0-9]{5,8}$/,
-            bdNumber: /^(01[3-9][0-9]{8})$/,
-            fourDigits: /^\d{4}$/,
-            cryptoUID: /^[0-9]{6,20}$/
+            bkash: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10}$/, nagad: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8}$/,
+            upay: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{8,12}$/, rocket: /^[0-9]{8,12}$/, tallykhata: /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6,12}$/,
+            binance: /^[0-9]{6,9}$/, bitget: /^[0-9]{6,9}$/, mexc: /^[0-9]{6,9}$/, redotpay: /^REDOT[0-9]{5,8}$/,
+            bdNumber: /^(01[3-9][0-9]{8})$/, fourDigits: /^\d{4}$/, cryptoUID: /^[0-9]{6,20}$/
         };
 
         const methods = [
-            { 
-                id: 'bkash', name: 'Bkash', type: 'bdt', bgClass: 'from-pink-600 to-pink-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.fourDigits, trxPattern: patterns.bkash, trxHint: "Example: 9H7J5K...", receiverPattern: patterns.bdNumber,
-                logo: "https://play-lh.googleusercontent.com/1CRcUfmtwvWxT2g-xJF8s9_btha42TLi6Lo-qVkVomXBb_citzakZX9BbeY51iholWs"
-            },
-            { 
-                id: 'nagad', name: 'Nagad', type: 'bdt', bgClass: 'from-orange-600 to-orange-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.fourDigits, trxPattern: patterns.nagad, trxHint: "Example: 7F3D...", receiverPattern: patterns.bdNumber,
-                logo: "https://play-lh.googleusercontent.com/9ps_d6nGKQzfbsJfMaFR0RkdwzEdbZV53ReYCS09Eo5MV-GtVylFD-7IHcVktlnz9Mo=w240-h480-rw"
-            },
-            { 
-                id: 'upay', name: 'Upay', type: 'bdt', bgClass: 'from-yellow-500 to-yellow-700', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.fourDigits, trxPattern: patterns.upay, trxHint: "Example: U7G...", receiverPattern: patterns.bdNumber,
-                logo: "https://play-lh.googleusercontent.com/ihEz3fNdT5fFzUr0ThhdT_6b5MPPTImKwoUDAujHrn37KDEDAqq-xGnxwFIGI9cbvOE=w240-h480-rw"
-            },
-            { 
-                id: 'rocket', name: 'Rocket', type: 'bdt', bgClass: 'from-purple-600 to-purple-800', min: 10, max: 2222, label: 'Personal', trxType: 'TrxID',
-                senderPattern: patterns.fourDigits, trxPattern: patterns.rocket, trxHint: "Example: R8K...", receiverPattern: patterns.bdNumber,
-                logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8=w240-h480-rw"
-            },
-            { 
-                id: 'tallykhata', name: 'TallyKhata', type: 'bdt', bgClass: 'from-red-700 to-red-900', min: 10, max: 2222, label: 'Wallet', trxType: 'TrxID',
-                senderPattern: patterns.fourDigits, trxPattern: patterns.tallykhata, trxHint: "Example: T9L...", receiverPattern: patterns.bdNumber,
-                logo: "https://play-lh.googleusercontent.com/96_mWv5NI3VsON40Wt1l5Xjw2gjy36hzbv5oRf10Vawtf9hKZjgnWqy7_i30-HqapndX=s48-rw" 
-            },
-            { 
-                id: 'redotpay', name: 'RedotPay', type: 'usd', bgClass: 'from-red-600 to-red-800', min: 0.10, max: 18.00, label: 'ID', trxType: 'Order ID',
-                senderPattern: patterns.redotpay, trxPattern: /^REDOT[0-9]{5,8}$/, trxHint: "Starts with REDOT...", receiverPattern: patterns.redotpay,
-                logo: "https://play-lh.googleusercontent.com/kvP-BmU-swM_AqJSTgCFZEc44L2qgC32LWF2xctra2Px8FkSriGv9D7aqMp5FU2u2Q=s48-rw"
-            },
-            { 
-                id: 'bitget', name: 'Bitget', type: 'usd', bgClass: 'from-cyan-600 to-cyan-800', min: 0.10, max: 18.00, label: 'UID', trxType: 'Order ID',
-                senderPattern: patterns.bitget, trxPattern: patterns.bitget, trxHint: "Bitget UID (6-9 digits)", receiverPattern: patterns.bitget,
-                logo: "https://play-lh.googleusercontent.com/taWX1dumJ_whqmmq0c4QZMML3FTuec43Va6wwO20Od6XkGsw6m4KnG5Bbm9Y7aNIojg=w240-h480-rw"
-            },
-            { 
-                id: 'binance', name: 'Binance', type: 'usd', bgClass: 'from-yellow-500 to-yellow-600', min: 0.10, max: 18.00, label: 'Pay ID', trxType: 'Proof/Ref',
-                senderPattern: patterns.binance, trxPattern: patterns.binance, trxHint: "Binance UID (6-9 digits)", receiverPattern: patterns.binance,
-                logo: "https://play-lh.googleusercontent.com/T1_WHAGs5WZePQejNSqqrxZah4uhBvYr698nTCFhXMjMZo5oSCoko5yW2wtmeO1ClRU=s48-rw"
-            },
-            { 
-                id: 'mexc', name: 'Mexc', type: 'usd', bgClass: 'from-blue-600 to-blue-800', min: 0.10, max: 18.00, label: 'UID', trxType: 'TxHash',
-                senderPattern: patterns.mexc, trxPattern: patterns.mexc, trxHint: "MEXC UID (6-9 digits)", receiverPattern: patterns.mexc,
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDUUxyLCj_1lah_lgYSaDDvXqfdPZxQbY0sw&s"
-            }
+            { id: 'bkash', name: 'Bkash', type: 'bdt', min: 10, max: 2222, label: 'Personal', senderPattern: patterns.fourDigits, trxPattern: patterns.bkash, logo: "https://play-lh.googleusercontent.com/1CRcUfmtwvWxT2g-xJF8s9_btha42TLi6Lo-qVkVomXBb_citzakZX9BbeY51iholWs" },
+            { id: 'nagad', name: 'Nagad', type: 'bdt', min: 10, max: 2222, label: 'Personal', senderPattern: patterns.fourDigits, trxPattern: patterns.nagad, logo: "https://play-lh.googleusercontent.com/9ps_d6nGKQzfbsJfMaFR0RkdwzEdbZV53ReYCS09Eo5MV-GtVylFD-7IHcVktlnz9Mo=w240-h480-rw" }, // Spelling Fixed
+            { id: 'upay', name: 'Upay', type: 'bdt', min: 10, max: 2222, label: 'Personal', senderPattern: patterns.fourDigits, trxPattern: patterns.upay, logo: "https://play-lh.googleusercontent.com/ihEz3fNdT5fFzUr0ThhdT_6b5MPPTImKwoUDAujHrn37KDEDAqq-xGnxwFIGI9cbvOE=w240-h480-rw" },
+            { id: 'rocket', name: 'Rocket', type: 'bdt', min: 10, max: 2222, label: 'Personal', senderPattern: patterns.fourDigits, trxPattern: patterns.rocket, logo: "https://play-lh.googleusercontent.com/sDY6YSDobbm_rX-aozinIX5tVYBSea1nAyXYI4TJlije2_AF5_5aG3iAS7nlrgo0lk8=w240-h480-rw" },
+            { id: 'tallykhata', name: 'TallyKhata', type: 'bdt', min: 10, max: 2222, label: 'Wallet', senderPattern: patterns.fourDigits, trxPattern: patterns.tallykhata, logo: "https://play-lh.googleusercontent.com/96_mWv5NI3VsON40Wt1l5Xjw2gjy36hzbv5oRf10Vawtf9hKZjgnWqy7_i30-HqapndX=s48-rw" },
+            { id: 'redotpay', name: 'RedotPay', type: 'usd', min: 0.10, max: 18.00, label: 'ID', trxType: 'Order ID', senderPattern: patterns.redotpay, trxPattern: /^REDOT[0-9]{5,8}$/, logo: "https://play-lh.googleusercontent.com/kvP-BmU-swM_AqJSTgCFZEc44L2qgC32LWF2xctra2Px8FkSriGv9D7aqMp5FU2u2Q=s48-rw" },
+            { id: 'bitget', name: 'Bitget', type: 'usd', min: 0.10, max: 18.00, label: 'UID', trxType: 'Order ID', senderPattern: patterns.bitget, trxPattern: patterns.bitget, logo: "https://play-lh.googleusercontent.com/taWX1dumJ_whqmmq0c4QZMML3FTuec43Va6wwO20Od6XkGsw6m4KnG5Bbm9Y7aNIojg=w240-h480-rw" },
+            { id: 'binance', name: 'Binance', type: 'usd', min: 0.10, max: 18.00, label: 'Pay ID', trxType: 'Proof/Ref', senderPattern: patterns.binance, trxPattern: patterns.binance, logo: "https://play-lh.googleusercontent.com/T1_WHAGs5WZePQejNSqqrxZah4uhBvYr698nTCFhXMjMZo5oSCoko5yW2wtmeO1ClRU=s48-rw" },
+            { id: 'mexc', name: 'Mexc', type: 'usd', min: 0.10, max: 18.00, label: 'UID', trxType: 'TxHash', senderPattern: patterns.mexc, trxPattern: patterns.mexc, logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDUUxyLCj_1lah_lgYSaDDvXqfdPZxQbY0sw&s" }
         ];
 
         let isShopOpen = true;
+        let isFetching = false; // 🔥 Semaphore lock to prevent overlapping requests
 
         document.addEventListener("DOMContentLoaded", function() {
-            fetchLiveSettings();
-            setInterval(fetchLiveSettings, 8000); 
+            // 🔒 CACHE: Load Config from cache first for INSTANT LOAD
+            loadConfigFromCache();
+            toggleLoading(true); // Show Skeletons
             
+            // 🔒 1 SECOND POLLING ENABLED AS REQUESTED
+            // Note: This makes the site check for new data every 1000ms
+            fetchLiveSettings(); 
+            setInterval(fetchLiveSettings, 1000); 
+
             const now = new Date();
             document.getElementById('userDate').value = now.toISOString().split('T')[0];
             let h = now.getHours(), m = now.getMinutes().toString().padStart(2, '0'), ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12; h = h ? h : 12;
             document.getElementById('userHour').value = h; document.getElementById('userMin').value = m; document.getElementById('userAmPm').value = ampm;
-            document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt; document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
+            
             renderDropdown('sendMethod', 'sendOptions', 'sendSelectedDisplay', false); renderDropdown('receiveMethod', 'receiveOptions', 'receiveSelectedDisplay', true);
             const receiveSelect = document.getElementById('receiveMethod'); receiveSelect.value = 'binance'; renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
-            generateStaticTicker(); updateUI();
-            updateShopStatus(); // Check time immediately
+            generateStaticTicker(); updateUI(); updateShopStatus(); updateThemeUI();
+            
+            // PWA Install Prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                document.getElementById('installAppBtn').classList.remove('hidden');
+                document.getElementById('installAppBtn').onclick = () => e.prompt();
+            });
+
             document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); });
         });
 
-        function fetchLiveSettings() {
-            fetch(`${GOOGLE_SCRIPT_URL}?action=getSettings&t=${Date.now()}`).then(r => r.json()).then(data => {
-                // Time & Status
-                if(data.shopOpenTime) CONFIG.shopOpenTime = data.shopOpenTime;
-                if(data.shopCloseTime) CONFIG.shopCloseTime = data.shopCloseTime;
-                if(data.shopStatusMsg) CONFIG.shopStatusMsg = data.shopStatusMsg;
-                if(data.notice_text) { CONFIG.notice.bn = data.notice_text; CONFIG.notice.en = data.notice_text; }
+        // Toggle Loading State (Skeleton)
+        function toggleLoading(isLoading) {
+            const skeletonMain = document.getElementById('mainSkeleton');
+            const contentMain = document.getElementById('calculatorContent');
+            const skeletonRes = document.getElementById('reserveSkeleton');
+            const contentRes = document.getElementById('reserveContent');
 
-                // Wallet Info
-                if(data.bkash) CONFIG.accounts.bkash = data.bkash;
-                if(data.nagad) CONFIG.accounts.nagad = data.nagad;
-                if(data.rocket) CONFIG.accounts.rocket = data.rocket;
-                if(data.upay) CONFIG.accounts.upay = data.upay;
-                if(data.tallykhata) CONFIG.accounts.tallykhata = data.tallykhata; // 👈 ADDED: TallyKhata Loading
-                if(data.binance_id) CONFIG.accounts.binance = data.binance_id;
-                if(data.bitget_id) CONFIG.accounts.bitget = data.bitget_id;
-                if(data.mexc_id) CONFIG.accounts.mexc = data.mexc_id;
-                if(data.redotpay_id) CONFIG.accounts.redotpay = data.redotpay_id;
-                if(data.whatsapp) CONFIG.whatsappNumber = data.whatsapp;
+            // Only show skeleton if NO data is cached
+            const cachedConfig = localStorage.getItem('user_config');
+            if(cachedConfig && isLoading) {
+                // If we have cache, don't show skeleton, just show cached data
+                return; 
+            }
 
-                // Reserves
-                if(data.reserveBDT) CONFIG.reserve.bdt = data.reserveBDT;
-                if(data.reserveUSDT) CONFIG.reserve.usdt = data.reserveUSDT;
-
-                // ✅ NEW: Specific Rates
-                if(data.rate_binance_buy) CONFIG.platformRates.binance.buy = parseFloat(data.rate_binance_buy);
-                if(data.rate_binance_sell) CONFIG.platformRates.binance.sell = parseFloat(data.rate_binance_sell);
-                if(data.rate_bitget_buy) CONFIG.platformRates.bitget.buy = parseFloat(data.rate_bitget_buy);
-                if(data.rate_bitget_sell) CONFIG.platformRates.bitget.sell = parseFloat(data.rate_bitget_sell);
-                if(data.rate_mexc_buy) CONFIG.platformRates.mexc.buy = parseFloat(data.rate_mexc_buy);
-                if(data.rate_mexc_sell) CONFIG.platformRates.mexc.sell = parseFloat(data.rate_mexc_sell);
-                if(data.rate_redotpay_buy) CONFIG.platformRates.redotpay.buy = parseFloat(data.rate_redotpay_buy);
-                if(data.rate_redotpay_sell) CONFIG.platformRates.redotpay.sell = parseFloat(data.rate_redotpay_sell);
-
-                document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt;
-                document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
-                
-                // Cache it
-                localStorage.setItem('siteConfig', JSON.stringify(CONFIG));
-                
-                updateShopStatus(); updateUI(); 
-            }).catch(e => console.error("Settings Error:", e));
+            if(isLoading) {
+                skeletonMain.classList.remove('hidden');
+                contentMain.classList.add('hidden');
+                skeletonRes.classList.remove('hidden');
+                contentRes.classList.add('hidden');
+            } else {
+                skeletonMain.classList.add('hidden');
+                contentMain.classList.remove('hidden');
+                skeletonRes.classList.add('hidden');
+                contentRes.classList.remove('hidden');
+            }
         }
 
-        // ✅ Updated Shop Timing Logic
-        function parseTime(timeStr) {
-            const [time, modifier] = timeStr.split(' ');
-            let [hours, minutes] = time.split(':');
-            if (hours === '12') hours = '00';
-            if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
-            return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+        // Theme Toggle Function
+        function toggleTheme() {
+            const body = document.body;
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+            }
+            updateThemeUI();
+        }
+
+        function updateThemeUI() {
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('light-theme')) {
+                icon.className = 'fa-solid fa-moon text-slate-700 text-xs md:text-sm';
+            } else {
+                icon.className = 'fa-solid fa-sun text-yellow-400 text-xs md:text-sm';
+            }
+        }
+
+        // 🔒 CACHE LOGIC for Config
+        function loadConfigFromCache() {
+            const cachedConfig = localStorage.getItem('user_config');
+            if(cachedConfig) {
+                try {
+                    const savedData = JSON.parse(cachedConfig);
+                    // Merge saved data into CONFIG
+                    Object.assign(CONFIG, savedData);
+                    updateUI();
+                    updateShopStatus();
+                    // Update ticker from cache if possible (using mock here but can be extended)
+                } catch(e) { console.error("Config Cache Error"); }
+            }
+        }
+
+        function fetchLiveSettings() {
+            if (isFetching) return; // 🔥 Exit if a request is already in progress
+            isFetching = true;
+
+            fetch(`${GOOGLE_SCRIPT_URL}?action=getSettings&t=${Date.now()}`)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.notice_text) { 
+                        CONFIG.notice.bn = data.notice_text; 
+                        CONFIG.notice.en = data.notice_text; 
+                        document.getElementById('noticeText').innerText = data.notice_text;
+                    }
+                    
+                    // Wallet Info (Keeping existing logic)
+                    if(data.bkash) CONFIG.accounts.bkash = data.bkash;
+                    if(data.nagad) CONFIG.accounts.nagad = data.nagad;
+                    if(data.rocket) CONFIG.accounts.rocket = data.rocket;
+                    if(data.rocket_extra) CONFIG.accounts.rocket_extra = data.rocket_extra; 
+                    if(data.upay) CONFIG.accounts.upay = data.upay;
+                    if(data.tallykhata) CONFIG.accounts.tallykhata = data.tallykhata;
+                    if(data.binance_id) CONFIG.accounts.binance = data.binance_id;
+                    if(data.bitget_id) CONFIG.accounts.bitget = data.bitget_id;
+                    if(data.mexc_id) CONFIG.accounts.mexc = data.mexc_id;
+                    if(data.redotpay_id) CONFIG.accounts.redotpay = data.redotpay_id;
+                    if(data.whatsapp) CONFIG.whatsappNumber = data.whatsapp;
+
+                    if(data.reserveBDT) CONFIG.reserve.bdt = data.reserveBDT;
+                    if(data.reserveUSDT) CONFIG.reserve.usdt = data.reserveUSDT;
+
+                    // Rates
+                    if(data.rate_binance_buy) CONFIG.platformRates.binance.buy = parseFloat(data.rate_binance_buy);
+                    if(data.rate_binance_sell) CONFIG.platformRates.binance.sell = parseFloat(data.rate_binance_sell);
+                    if(data.rate_bitget_buy) CONFIG.platformRates.bitget.buy = parseFloat(data.rate_bitget_buy);
+                    if(data.rate_bitget_sell) CONFIG.platformRates.bitget.sell = parseFloat(data.rate_bitget_sell);
+                    if(data.rate_mexc_buy) CONFIG.platformRates.mexc.buy = parseFloat(data.rate_mexc_buy);
+                    if(data.rate_mexc_sell) CONFIG.platformRates.mexc.sell = parseFloat(data.rate_mexc_sell);
+                    if(data.rate_redotpay_buy) CONFIG.platformRates.redotpay.buy = parseFloat(data.rate_redotpay_buy);
+                    if(data.rate_redotpay_sell) CONFIG.platformRates.redotpay.sell = parseFloat(data.rate_redotpay_sell);
+
+                    // Service Fees
+                    if(data.fee_slab_1) CONFIG.fees.slab1 = parseFloat(data.fee_slab_1);
+                    if(data.fee_slab_2) CONFIG.fees.slab2 = parseFloat(data.fee_slab_2);
+                    if(data.fee_slab_3) CONFIG.fees.slab3 = parseFloat(data.fee_slab_3);
+                    if(data.fee_slab_4) CONFIG.fees.slab4 = parseFloat(data.fee_slab_4);
+                    if(data.fee_slab_5) CONFIG.fees.slab5 = parseFloat(data.fee_slab_5);
+
+                    // 🔒 CACHE: Update local storage
+                    localStorage.setItem('user_config', JSON.stringify(CONFIG));
+
+                    document.getElementById('reserveBDT').innerText = "৳ " + CONFIG.reserve.bdt;
+                    document.getElementById('reserveUSDT').innerText = "$ " + CONFIG.reserve.usdt;
+                    
+                    toggleLoading(false); // Hide Skeletons
+                    updateShopStatus(); updateUI(); 
+                })
+                .catch(e => {
+                    // console.warn("Network busy, skipping this poll..."); // Silent fail or warn
+                })
+                .finally(() => {
+                    isFetching = false; // 🔥 Release lock
+                });
+        }
+
+        // Receipt Generator (Last Stored Order Data)
+        let lastOrderData = null;
+
+        function generateReceipt() {
+            if (!lastOrderData) { showToast("No order data found", "error"); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Simple Header
+            doc.setFillColor(16, 185, 129); // Emerald color
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.text("Money Exchanger BD", 105, 13, null, null, "center");
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            
+            const tableData = [
+                ["Transaction ID", lastOrderData.trxId],
+                ["Date", lastOrderData.timestamp],
+                ["Platform", lastOrderData.platform],
+                ["Sender ID", lastOrderData.userIdentifier],
+                ["Amount Sent", lastOrderData.amountReceived],
+                ["Amount Received", lastOrderData.amountSent],
+                ["Status", "Pending Verification"]
+            ];
+
+            doc.autoTable({
+                startY: 30,
+                head: [['Field', 'Details']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [16, 185, 129] }
+            });
+
+            doc.text("Note: This receipt is generated automatically.", 14, doc.lastAutoTable.finalY + 10);
+            
+            // ✅ 1. DOWNLOAD FIRST (Mandatory)
+            doc.save(`Receipt_${lastOrderData.trxId}.pdf`);
+
+            // ✅ 2. ONLY THEN SEND TO SERVER
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(lastOrderData)
+            }).catch(err => console.error("Sheet Error:", err));
+
+            // --- 🚀 NEW LOGIC START: Close Modal, Reset, Redirect ---
+            
+            // 3. Close Modal Immediately
+            document.getElementById('receiptModal').classList.add('hidden');
+            document.getElementById('receiptModal').classList.remove('flex');
+
+            // 4. Clear Form & Reset State
+            document.getElementById('sendAmount').value = '';
+            document.getElementById('userNumber').value = '';
+            document.getElementById('userTrxID').value = '';
+            document.getElementById('receiverDetails').value = '';
+            document.getElementById('userWhatsapp').value = ''; 
+            
+            document.getElementById('dynamicSendPreview').classList.add('hidden');
+            document.getElementById('calcBreakdown').classList.add('hidden');
+            
+            // Disable Submit Button
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.classList.add('bg-gradient-to-r', 'from-gray-700', 'to-gray-800', 'text-gray-400', 'cursor-not-allowed', 'border-white/10');
+            btn.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-emerald-700', 'text-white', 'cursor-pointer', 'shadow-emerald-500/20', 'animate-pulse');
+            btn.innerHTML = '<span class="lang-bn">অর্ডার কনফার্ম করুন</span><span class="lang-en hidden">Confirm Order</span><i class="fa-brands fa-whatsapp text-2xl"></i>';
+
+            // 5. Redirect to WhatsApp (Milliseconds after save)
+            const message = `*🔔 ADMIN CHECK PLEASE!*
+------------------
+🆔 TrxID: ${lastOrderData.trxId}
+💰 Amount: ${lastOrderData.amountReceived}
+🔄 Type: ${lastOrderData.platform}
+------------------
+✅ *Please verify & complete.*`.trim();
+            
+            const waURL = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(waURL, '_blank');
+            // --- 🚀 NEW LOGIC END ---
         }
 
         function updateShopStatus() {
+            // 🔒 HARDCODED LOGIC: 8 AM to 8 PM Bangladesh Time
             const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            const openMinutes = parseTime(CONFIG.shopOpenTime);
-            const closeMinutes = parseTime(CONFIG.shopCloseTime);
-
-            const statusBadge = document.getElementById('statusBadge');
-            const noticeText = document.getElementById('noticeText');
-            const lang = localStorage.getItem('siteLang') || 'bn';
-
-            // Update Popup Text
+            // Convert current time to Bangladesh Time (Asia/Dhaka)
+            const bdTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Dhaka"}));
+            const hour = bdTime.getHours();
+            
+            // Logic: Open from 08:00 (inclusive) to 20:00 (exclusive, i.e., until 7:59 PM)
+            // 8 AM is 8, 8 PM is 20
+            const isOpen = (hour >= 8 && hour < 20);
+            
             document.getElementById('closedMsgText').innerText = CONFIG.shopStatusMsg;
-            document.getElementById('shopOpenTimeDisplay').innerText = CONFIG.shopOpenTime;
-            document.getElementById('shopCloseTimeDisplay').innerText = CONFIG.shopCloseTime;
-
-            // Check if within range
-            let isOpen = false;
-            if (closeMinutes < openMinutes) {
-                // Crosses midnight (e.g. 10 PM to 2 AM)
-                isOpen = (currentMinutes >= openMinutes || currentMinutes < closeMinutes);
-            } else {
-                isOpen = (currentMinutes >= openMinutes && currentMinutes < closeMinutes);
-            }
+            document.getElementById('shopOpenTimeDisplay').innerText = "08:00 AM";
+            document.getElementById('shopCloseTimeDisplay').innerText = "08:00 PM";
             
             isShopOpen = isOpen;
 
+            const statusBadge = document.getElementById('statusBadge');
+
             if (isShopOpen) {
-                const badgeText = (lang === 'en') ? 'Online' : 'অনলাইন';
-                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> ${badgeText}`;
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span> Online`;
                 statusBadge.className = "px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
-                noticeText.innerText = (lang === 'en') ? CONFIG.notice.en : CONFIG.notice.bn;
-                document.getElementById('timePopup').classList.add('hidden');
-                document.getElementById('timePopup').classList.remove('flex');
+                document.getElementById('timePopup').classList.add('hidden'); document.getElementById('timePopup').classList.remove('flex');
             } else {
-                const badgeText = (lang === 'en') ? 'Offline' : 'অফলাইন';
-                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> ${badgeText}`;
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></span> Offline`;
                 statusBadge.className = "px-2 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 bg-red-900/30 text-red-400 border border-red-500/30";
-                noticeText.innerText = (lang === 'en') ? "We are Offline." : "দুঃখিত! এখন আমরা অফলাইন।";
-                
-                // Show Popup if not already shown
                 if(!sessionStorage.getItem('popupShown')) {
-                     document.getElementById('timePopup').classList.remove('hidden'); 
-                     document.getElementById('timePopup').classList.add('flex');
+                     document.getElementById('timePopup').classList.remove('hidden'); document.getElementById('timePopup').classList.add('flex');
                      sessionStorage.setItem('popupShown', 'true');
                 }
             }
         }
 
-        // ✅ Updated Track Order Logic with GET to fix CORS
+        function togglePrivacyModal(show) {
+            const modal = document.getElementById('privacyModal');
+            if(show) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+        }
+
         function toggleTrackingModal(show) {
             const modal = document.getElementById('trackingModal');
             if(show) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
@@ -882,116 +881,51 @@
                 document.getElementById('trackTrxInput').value = ""; 
                 document.getElementById('trackResult').classList.add('hidden'); 
                 document.getElementById('trackLoading').classList.add('hidden'); 
-                document.getElementById('btnSpinner').classList.add('hidden'); 
             }
         }
 
         function trackOrder() {
             const trxId = document.getElementById('trackTrxInput').value.trim().toUpperCase(); 
             if(!trxId) { showToast("Please enter a TrxID", "error"); return; }
-
-            const resultBox = document.getElementById('trackResult');
-            const loading = document.getElementById('trackLoading');
-            const btnSpinner = document.getElementById('btnSpinner');
+            document.getElementById('trackResult').classList.add('hidden');
+            document.getElementById('trackLoading').classList.remove('hidden');
             
-            resultBox.classList.add('hidden');
-            document.getElementById('trackReasonBox').classList.add('hidden');
-            
-            loading.classList.remove('hidden');
-            btnSpinner.classList.remove('hidden');
-
-            fetchOrderData(trxId, false);
-        }
-        
-        function fetchOrderData(trxId, isBackground) {
             fetch(`${GOOGLE_SCRIPT_URL}?action=read&t=${Date.now()}`)
             .then(response => response.json())
             .then(data => {
-                if (!isBackground) {
-                    document.getElementById('trackLoading').classList.add('hidden');
-                    document.getElementById('btnSpinner').classList.add('hidden');
-                }
-                
-                let foundItem = null;
-                if (Array.isArray(data)) {
-                    foundItem = data.find(item => item.trxId && item.trxId.toString().trim().toUpperCase() === trxId);
-                }
-                
+                document.getElementById('trackLoading').classList.add('hidden');
+                let foundItem = Array.isArray(data) ? data.find(item => item.trxId && item.trxId.toString().trim().toUpperCase() === trxId) : null;
                 if(foundItem) {
-                    const formattedData = {
-                        ...foundItem,
-                        amountIn: foundItem.amountReceived, 
-                        amountOut: foundItem.amountSent,
-                        time: foundItem.timestamp
-                    };
-                    renderTrackResult(formattedData);
-                } else if (!isBackground) {
-                    showToast("Order not found!", "error");
-                    document.getElementById('trackResult').classList.add('hidden');
-                }
+                    document.getElementById('trackResult').classList.remove('hidden');
+                    document.getElementById('trackTime').innerText = foundItem.timestamp;
+                    document.getElementById('trackTrxIdDisplay').innerText = foundItem.trxId;
+                    document.getElementById('trackAmountIn').innerText = foundItem.amountReceived;
+                    document.getElementById('trackAmountOut').innerText = foundItem.amountSent;
+                    document.getElementById('trackSender').innerText = foundItem.userIdentifier;
+                    document.getElementById('trackSenderRow').classList.remove('hidden');
+                    const badge = document.getElementById('trackStatusBadge');
+                    badge.innerText = foundItem.status;
+                    if(foundItem.status.toLowerCase().includes("success")) badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-green-500/20 text-green-400 border border-green-500/50";
+                    else if (foundItem.status === "Pending") badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-yellow-500/20 text-yellow-400 border border-yellow-500/50";
+                    else badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-red-500/20 text-red-400 border border-red-500/50";
+                    if(foundItem.reason) { document.getElementById('trackReasonBox').classList.remove('hidden'); document.getElementById('trackReasonText').innerText = foundItem.reason; }
+                    else document.getElementById('trackReasonBox').classList.add('hidden');
+                } else showToast("Order not found!", "error");
             })
-            .catch(error => {
-                if (!isBackground) {
-                    document.getElementById('trackLoading').classList.add('hidden');
-                    document.getElementById('btnSpinner').classList.add('hidden');
-                    showToast("Connection Error.", "error");
-                }
-            });
-        }
-        
-        function renderTrackResult(data) {
-            document.getElementById('trackResult').classList.remove('hidden');
-            document.getElementById('trackTime').innerText = data.time || "N/A";
-            document.getElementById('trackTrxIdDisplay').innerText = data.trxId;
-            document.getElementById('trackAmountIn').innerText = data.amountIn || "N/A";
-            document.getElementById('trackAmountOut').innerText = data.amountOut || "N/A";
-            
-            const senderRow = document.getElementById('trackSenderRow');
-            document.getElementById('trackSender').innerText = data.userIdentifier || "******";
-            senderRow.classList.remove('hidden');
-
-            const badge = document.getElementById('trackStatusBadge');
-            const reasonBox = document.getElementById('trackReasonBox');
-            const status = data.status || "Pending";
-            
-            if(status.toLowerCase().includes("success")) {
-                badge.innerText = "Successful";
-                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-green-500/20 text-green-400 border border-green-500/50";
-                reasonBox.classList.add('hidden');
-            } else if (status === "Pending") {
-                badge.innerText = "Pending";
-                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-yellow-500/20 text-yellow-400 border border-yellow-500/50";
-                reasonBox.classList.add('hidden');
-            } else {
-                badge.innerText = status;
-                badge.className = "px-4 py-1 rounded-full text-xs font-bold uppercase bg-red-500/20 text-red-400 border border-red-500/50";
-                reasonBox.classList.remove('hidden');
-                document.getElementById('trackReasonText').innerText = data.reason || "No reason provided.";
-            }
+            .catch(() => { document.getElementById('trackLoading').classList.add('hidden'); showToast("Connection Error.", "error"); });
         }
 
         function toggleGlobalLanguage() {
             const currentLang = localStorage.getItem('siteLang') || 'bn';
             const newLang = currentLang === 'bn' ? 'en' : 'bn';
             localStorage.setItem('siteLang', newLang);
-            applyGlobalLanguage(newLang); updateUI(); updateShopStatus();
+            applyGlobalLanguage(newLang); updateUI();
         }
 
         function applyGlobalLanguage(lang) {
-            const bnEls = document.querySelectorAll('.lang-bn');
-            const enEls = document.querySelectorAll('.lang-en');
-            if (lang === 'en') {
-                bnEls.forEach(el => el.classList.add('hidden'));
-                enEls.forEach(el => el.classList.remove('hidden'));
-            } else {
-                bnEls.forEach(el => el.classList.remove('hidden'));
-                enEls.forEach(el => el.classList.add('hidden'));
-            }
-        }
-
-        function togglePrivacy(show) {
-            const modal = document.getElementById('privacyModal');
-            // Mock Privacy Toggle
+            const bnEls = document.querySelectorAll('.lang-bn'); const enEls = document.querySelectorAll('.lang-en');
+            if (lang === 'en') { bnEls.forEach(el => el.classList.add('hidden')); enEls.forEach(el => el.classList.remove('hidden')); } 
+            else { bnEls.forEach(el => el.classList.remove('hidden')); enEls.forEach(el => el.classList.add('hidden')); }
         }
 
         function renderDropdown(selectId, optionsId, displayId, isReceive) {
@@ -1003,7 +937,7 @@
                 const logoHtml = `<img src="${m.logo}" class="w-6 h-6 rounded-full object-contain bg-white p-[2px]" onerror="this.src='https://via.placeholder.com/24?text=${m.name[0]}'">`;
                 const optionDiv = document.createElement('div');
                 optionDiv.className = `custom-option`; optionDiv.setAttribute('data-value', m.id);
-                optionDiv.innerHTML = `${logoHtml} <span class="text-sm font-medium text-gray-200">${m.name}</span>`;
+                optionDiv.innerHTML = `${logoHtml} <span class="text-sm font-medium text-gray-200" style="color: var(--text-color)">${m.name}</span>`; // Fixed text color in light mode
                 optionDiv.onclick = function() {
                     if (this.classList.contains('disabled')) return;
                     select.value = m.id; select.dispatchEvent(new Event('change'));
@@ -1018,26 +952,15 @@
             const select = document.getElementById(selectId);
             const display = document.getElementById(displayId);
             const selectedMethod = methods.find(m => m.id === select.value);
-            if (selectedMethod) {
-                display.innerHTML = `<img src="${selectedMethod.logo}" class="w-8 h-8 rounded-full object-contain bg-white shadow-md border border-white/20 p-1" onerror="this.src='https://via.placeholder.com/32?text=${selectedMethod.name[0]}'"> <span class="font-bold text-lg tracking-wide">${selectedMethod.name}</span>`;
-            }
+            if (selectedMethod) display.innerHTML = `<img src="${selectedMethod.logo}" class="w-8 h-8 rounded-full object-contain bg-white shadow-md border border-white/20 p-1" onerror="this.src='https://via.placeholder.com/32?text=${selectedMethod.name[0]}'"> <span class="font-bold text-lg tracking-wide text-gray-200" style="color: var(--text-color)">${selectedMethod.name}</span>`;
         }
 
         function toggleDropdown(id) { document.querySelectorAll('.custom-options').forEach(el => { if (el.id !== id) el.classList.remove('show'); }); document.getElementById(id).classList.toggle('show'); }
-
-        function swapMethods() {
-            const sendSelect = document.getElementById('sendMethod');
-            const receiveSelect = document.getElementById('receiveMethod');
-            const temp = sendSelect.value;
-            sendSelect.value = receiveSelect.value;
-            receiveSelect.value = temp;
-            updateUI();
-        }
+        function swapMethods() { const s = document.getElementById('sendMethod'); const r = document.getElementById('receiveMethod'); const t = s.value; s.value = r.value; r.value = t; updateUI(); }
 
         function updateUI() {
             const sendId = document.getElementById('sendMethod').value;
             const receiveId = document.getElementById('receiveMethod').value;
-            const lang = localStorage.getItem('siteLang') || 'bn';
             let sendObj = methods.find(m => m.id === sendId);
             let receiveObj = methods.find(m => m.id === receiveId);
 
@@ -1046,167 +969,131 @@
                 document.getElementById('receiveMethod').value = newReceiveObj.id;
                 receiveObj = newReceiveObj; 
             }
-
-            renderDropdownSelection('sendMethod', 'sendSelectedDisplay');
-            renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
+            renderDropdownSelection('sendMethod', 'sendSelectedDisplay'); renderDropdownSelection('receiveMethod', 'receiveSelectedDisplay');
 
             Array.from(document.getElementById('receiveOptions').children).forEach(opt => {
                 const val = opt.getAttribute('data-value');
                 if (val === sendId) opt.classList.add('disabled', 'opacity-30'); else opt.classList.remove('disabled', 'opacity-30');
             });
-
             if(sendObj.type === 'usd') document.getElementById('qrCodeContainer').classList.remove('hidden'); else document.getElementById('qrCodeContainer').classList.add('hidden');
             
             document.getElementById('sendCurrency').innerText = sendObj.type.toUpperCase();
             document.getElementById('receiveCurrency').innerText = receiveObj.type.toUpperCase();
-            
-            const amountInput = document.getElementById('sendAmount');
-            amountInput.placeholder = `${sendObj.min}-${sendObj.max}`;
+            document.getElementById('sendAmount').placeholder = `${sendObj.min}-${sendObj.max}`;
             document.getElementById('minAmountHint').innerText = `Limit: ${sendObj.min} - ${sendObj.max} ${sendObj.type.toUpperCase()}`;
-
-            document.getElementById('senderLabel').innerText = (lang === 'en') ? `Sender Last 4 Digits` : `যে নাম্বার থেকে টাকা পাঠিয়েছেন তার শেষ ৪ সংখ্যা`;
-            document.getElementById('userNumber').placeholder = "xxxx"; 
             
             if (sendObj.type === 'bdt') {
-                document.getElementById('trxLabel').innerText = `${sendObj.name} TrxID`;
-                
-                // ✅ UPAY SPECIAL PLACEHOLDER UPDATE
-                if (sendId === 'upay') {
-                    document.getElementById('userTrxID').placeholder = "Type TrxID (Copy Paste will fail)";
-                    document.getElementById('trxLabel').innerHTML = `Upay TrxID <span class='text-red-400 text-[9px]'>(Type manually)</span>`;
-                } else {
-                    document.getElementById('userTrxID').placeholder = sendObj.trxHint || "TrxID...";
-                    document.getElementById('trxLabel').innerText = `${sendObj.name} TrxID`;
-                }
+                if (sendId === 'upay') { document.getElementById('userTrxID').placeholder = "Type manually"; document.getElementById('trxLabel').innerHTML = `Upay TrxID <span class='text-red-400 text-[9px]'>(Type manually)</span>`; } 
+                else { document.getElementById('userTrxID').placeholder = "TrxID..."; document.getElementById('trxLabel').innerText = `${sendObj.name} TrxID`; }
             } else {
-                document.getElementById('trxLabel').innerText = `${sendObj.name} ${sendObj.trxType}`; 
-                document.getElementById('userTrxID').placeholder = sendObj.trxHint || "Reference...";
+                document.getElementById('trxLabel').innerText = `${sendObj.name} ${sendObj.trxType}`; document.getElementById('userTrxID').placeholder = "Reference...";
             }
 
-            const receiverLabel = document.getElementById('receiverLabel');
-            const receiverInput = document.getElementById('receiverDetails');
-            const receiverHint = document.getElementById('receiverHint');
-            
             if(receiveObj.type === 'bdt') {
-                receiverLabel.innerText = (lang === 'en') ? `Receiver ${receiveObj.name} Number` : `যে ${receiveObj.name} নাম্বারে টাকা নিবেন`;
-                receiverInput.placeholder = "01xxxxxxxxx";
-                receiverInput.setAttribute('inputmode', 'numeric');
-                receiverHint.innerText = (lang === 'en') ? `Caution: Provide correct ${receiveObj.name} number.` : `সতর্কতা: সঠিক ${receiveObj.name} নাম্বার দিন।`;
-                receiverInput.setAttribute('maxlength', '11');
+                document.getElementById('receiverLabel').innerText = `যে ${receiveObj.name} নাম্বারে টাকা নিবেন`;
+                document.getElementById('receiverDetails').placeholder = "01xxxxxxxxx";
+                document.getElementById('receiverDetails').setAttribute('inputmode', 'numeric');
+                document.getElementById('receiverDetails').setAttribute('maxlength', '11');
             } else {
-                receiverLabel.innerText = (lang === 'en') ? `Receiver ${receiveObj.name} ID` : `যে ${receiveObj.name} আইডিতে ডলার নিবেন`;
-                receiverInput.placeholder = (lang === 'en') ? `Enter ${receiveObj.label}...` : `${receiveObj.label} দিন...`;
-                receiverInput.setAttribute('inputmode', 'text');
-                receiverHint.innerText = (lang === 'en') ? `Caution: Correct ${receiveObj.name} ${receiveObj.label} only.` : `সতর্কতা: সঠিক ${receiveObj.name} ${receiveObj.label} দিন।`;
-                receiverInput.removeAttribute('maxlength');
+                document.getElementById('receiverLabel').innerText = `যে ${receiveObj.name} আইডিতে ডলার নিবেন`;
+                document.getElementById('receiverDetails').placeholder = `${receiveObj.label} দিন...`;
+                document.getElementById('receiverDetails').setAttribute('inputmode', 'text');
+                document.getElementById('receiverDetails').removeAttribute('maxlength');
             }
 
             document.getElementById('adminMethodName').innerText = sendObj.name;
-            let accInfo = CONFIG.accounts[sendId];
-            let displayAcc = accInfo ? accInfo : "Contact Admin";
-            const adminNumEl = document.getElementById('adminNumberText');
-            adminNumEl.setAttribute('data-copy-value', displayAcc);
-            if(sendId === 'rocket' && accInfo) displayAcc = accInfo + "-(8)";
-            adminNumEl.innerText = displayAcc;
-            document.getElementById('adminAccountType').innerText = `(${sendObj.label})`;
+            
+            // ✅ ROCKET EXTRA NUMBER LOGIC FOR DISPLAY AND COPY
+            let accInfo = CONFIG.accounts[sendId] || "Contact Admin";
+            let displayValue = accInfo;
+            let copyValue = accInfo;
 
+            if (sendId === 'rocket' && accInfo !== "Contact Admin" && accInfo !== "Loading...") {
+                let extra = CONFIG.accounts.rocket_extra || "8"; // Default extra digit
+                displayValue = `${accInfo}-(${extra})`; // Shows: 017xxx-(8)
+                copyValue = accInfo; // Copies: 017xxx only
+            }
+
+            document.getElementById('adminNumberText').innerText = displayValue;
+            document.getElementById('adminNumberText').setAttribute('data-copy-value', copyValue);
+            document.getElementById('adminAccountType').innerText = `(${sendObj.label})`;
             validateForm(); 
         }
 
-        // ✅ NEW: Specific Service Charge for Crypto Platforms
-        function getCryptoServiceFee(amountInBDT) {
-            if (amountInBDT >= 10 && amountInBDT <= 50) return 1.5;
-            if (amountInBDT >= 51 && amountInBDT <= 100) return 2.5;
-            if (amountInBDT >= 101 && amountInBDT <= 500) return 3.5;
-            if (amountInBDT >= 501 && amountInBDT <= 1000) return 4;
-            if (amountInBDT >= 1001 && amountInBDT <= 2222) return 5;
-            return 0;
-        }
-
-        function getStandardServiceFee(amountInBDT) {
-            if (amountInBDT >= 10 && amountInBDT <= 50) return 2;
-            if (amountInBDT >= 51 && amountInBDT <= 100) return 3;
-            if (amountInBDT >= 101 && amountInBDT <= 500) return 4;
-            if (amountInBDT >= 501 && amountInBDT <= 2222) return 5;
-            return 0; 
-        }
-
-        // ✅ RE-ORGANIZED: Transaction Logic Calculation with Specific Rates
+        // ✅ Advanced Fee Calculation Logic with Dynamic Slabs
         function calculateValues(amountInput, sendObj, receiveObj) {
-            if (!amountInput || isNaN(amountInput)) return { fee: 0, finalAmount: 0, feeDesc: "", extraSendFee: 0 };
+            if (!amountInput || isNaN(amountInput)) return { fee: 0, finalAmount: 0, feeDesc: "" };
             
-            // 1. DETERMINE RATES (Specific or Global)
-            let currentUsdToBdt = CONFIG.rates.usdToBdt; // Default Sell Rate
-            let currentBdtToUsd = CONFIG.rates.bdtToUsd; // Default Buy Rate
+            let currentUsdToBdt = CONFIG.rates.usdToBdt; 
+            let currentBdtToUsd = CONFIG.rates.bdtToUsd; 
 
-            // Check if Sending USD (We are Buying from user, giving BDT) -> Use "sell" rate from config (Admin Buy Rate)
-            if (sendObj.type === 'usd' && CONFIG.platformRates[sendObj.id]) {
-                // Warning: In Admin, 'sell' usually means Admin sells to user. 'buy' means Admin buys from user.
-                // Here: User sends USD (Admin Buys). So we need Admin Buy Rate.
-                // In Config: 'sell' label was "Rate: You Buy (User Sells)". Correct.
-                if(CONFIG.platformRates[sendObj.id].sell) currentUsdToBdt = CONFIG.platformRates[sendObj.id].sell;
+            if (sendObj.type === 'usd' && CONFIG.platformRates[sendObj.id]?.sell) currentUsdToBdt = CONFIG.platformRates[sendObj.id].sell;
+            if (receiveObj.type === 'usd' && CONFIG.platformRates[receiveObj.id]?.buy) currentBdtToUsd = CONFIG.platformRates[receiveObj.id].buy;
+
+            let equivalentBDT = (sendObj.type === 'usd') ? amountInput * currentUsdToBdt : amountInput;
+            if(equivalentBDT < 10 || equivalentBDT > 2222) return { fee: 0, finalAmount: 0, feeDesc: "Limit" };
+
+            // --- FEE LOGIC START ---
+            let cashoutPercent = 0;
+            let serviceFeeFixed = 0; 
+            let sendMoneyFee = 0;
+            const sendId = sendObj.id;
+            const receiveId = receiveObj.id;
+
+            // 1. Determine Service Fee based on Amount (Dynamic Slabs)
+            if (equivalentBDT >= 10 && equivalentBDT <= 50) serviceFeeFixed = CONFIG.fees.slab1;
+            else if (equivalentBDT >= 51 && equivalentBDT <= 100) serviceFeeFixed = CONFIG.fees.slab2;
+            else if (equivalentBDT >= 101 && equivalentBDT <= 300) serviceFeeFixed = CONFIG.fees.slab3;
+            else if (equivalentBDT >= 301 && equivalentBDT <= 1000) serviceFeeFixed = CONFIG.fees.slab4;
+            else if (equivalentBDT >= 1001 && equivalentBDT <= 2222) serviceFeeFixed = CONFIG.fees.slab5;
+
+            // 2. CASHOUT FEE (Based on Sender)
+            // User requested: If Bkash, Nagad, Upay, Rocket, TallyKhata is selected as Send, apply Cashout Charge.
+            if (sendId === 'bkash' || sendId === 'upay' || sendId === 'rocket' || sendId === 'tallykhata') {
+                cashoutPercent = 1.85; // Standard Cashout Fee
             }
-
-            // Check if Receiving USD (We are Selling to user, taking BDT) -> Use "buy" rate from config (Admin Sell Rate)
-            if (receiveObj.type === 'usd' && CONFIG.platformRates[receiveObj.id]) {
-                // Here: User receives USD (Admin Sells). So we need Admin Sell Rate.
-                // In Config: 'buy' label was "Rate: You Sell (User Buys)". Correct.
-                if(CONFIG.platformRates[receiveObj.id].buy) currentBdtToUsd = CONFIG.platformRates[receiveObj.id].buy;
+            else if (sendId === 'nagad') {
+                cashoutPercent = 1.50; // Nagad Cashout Fee
             }
-
-            let equivalentBDT = amountInput;
-            if(sendObj.type === 'usd') equivalentBDT = amountInput * currentUsdToBdt;
-
-            if(equivalentBDT < 10 || equivalentBDT > 2222) return { fee: 0, finalAmount: 0, feeDesc: "Limit", extraSendFee: 0 };
-
-            let totalFeeBDT = 0, feeDescription = "", serviceFeeBDT = 0, extraSendMoneyFeeBDT = 0, cashoutFeeBDT = 0;
             
-            const cryptoPlatforms = ['binance', 'bitget', 'mexc', 'redotpay'];
-            const isCryptoInvolved = cryptoPlatforms.includes(sendObj.id) || cryptoPlatforms.includes(receiveObj.id);
+            // Previously there was logic to remove this fee for Crypto receivers. 
+            // Removed that logic to enforce the fee as per user request.
 
-            // 1. Service Fee
-            if (isCryptoInvolved) serviceFeeBDT = getCryptoServiceFee(equivalentBDT);
-            else serviceFeeBDT = getStandardServiceFee(equivalentBDT);
+            const cryptoSenders = ['binance', 'bitget', 'mexc', 'redotpay'];
+            if (cryptoSenders.includes(sendId)) cashoutPercent = 0; 
 
-            // 2. Cashout Fee (Only for BDT Send)
-            if (sendObj.type === 'bdt') {
-                const cashoutRate = CONFIG.cashoutRates[sendObj.id] || 1.85; 
-                cashoutFeeBDT = (equivalentBDT * cashoutRate) / 100;
-            }
+            // 3. SEND MONEY FEE (Based on Receiver Rules)
+            if (receiveId === 'nagad') sendMoneyFee = 5.00;
+            if (receiveId === 'bkash' && equivalentBDT > 100) sendMoneyFee = 5.00;
 
-            // 3. Send Money Fee (Nagad/Bkash Receive)
-            if (receiveObj.id === 'nagad' && equivalentBDT >= 10) extraSendMoneyFeeBDT = 5; 
-            else if (receiveObj.id === 'bkash' && equivalentBDT >= 100) extraSendMoneyFeeBDT = 5;
+            let cashoutFeeAmount = (equivalentBDT * cashoutPercent) / 100;
+            let totalDeductionBDT = cashoutFeeAmount + serviceFeeFixed + sendMoneyFee;
 
-            totalFeeBDT = serviceFeeBDT + cashoutFeeBDT + extraSendMoneyFeeBDT;
-            
-            feeDescription += `Service ৳${serviceFeeBDT.toFixed(2)}`;
-            if(cashoutFeeBDT > 0) feeDescription += ` + Cashout ৳${cashoutFeeBDT.toFixed(2)}`;
-            if(extraSendMoneyFeeBDT > 0) feeDescription += ` + Send ৳${extraSendMoneyFeeBDT.toFixed(2)}`;
+            let feeParts = [];
+            if (cashoutFeeAmount > 0) feeParts.push(`Cashout ৳${cashoutFeeAmount.toFixed(2)}`);
+            feeParts.push(`Service ৳${serviceFeeFixed}`);
+            if (sendMoneyFee > 0) feeParts.push(`SendFee ৳${sendMoneyFee}`);
+            let feeDescription = feeParts.join(" + ");
 
-            let finalAmount = 0, rateText = "";
-            let netAmountBDT = equivalentBDT - totalFeeBDT;
+            let finalAmount = 0;
+            let rateText = "";
+            let netAmountBDT = equivalentBDT - totalDeductionBDT;
 
             if (sendObj.type === receiveObj.type) { 
-                finalAmount = amountInput - totalFeeBDT; 
+                finalAmount = netAmountBDT; 
                 rateText = `1 ${sendObj.type.toUpperCase()} = 1 ${receiveObj.type.toUpperCase()}`; 
             }
             else if (sendObj.type === 'bdt' && receiveObj.type === 'usd') { 
-                // User Buying USD
                 finalAmount = netAmountBDT / currentBdtToUsd; 
                 rateText = `1 USD = ${currentBdtToUsd} BDT`; 
             }
             else if (sendObj.type === 'usd' && receiveObj.type === 'bdt') { 
-                // User Selling USD
                 finalAmount = netAmountBDT; 
                 rateText = `1 USD = ${currentUsdToBdt} BDT`; 
             }
             
-            let feeInSendUnit = 0;
-            if(sendObj.type === 'usd') feeInSendUnit = totalFeeBDT / currentUsdToBdt;
-            else feeInSendUnit = totalFeeBDT;
-
-            return { fee: feeInSendUnit, finalAmount: finalAmount, feeDesc: feeDescription, rateText: rateText, extraSendFee: extraSendMoneyFeeBDT };
+            let feeInSendUnit = (sendObj.type === 'usd') ? totalDeductionBDT / currentUsdToBdt : totalDeductionBDT;
+            return { fee: feeInSendUnit, finalAmount: finalAmount, feeDesc: feeDescription, rateText: rateText };
         }
 
         function validateForm() {
@@ -1217,10 +1104,6 @@
             const userWhatsapp = document.getElementById('userWhatsapp').value;
             const userDate = document.getElementById('userDate').value;
             
-            const userHour = document.getElementById('userHour').value;
-            const userMin = document.getElementById('userMin').value;
-            const lang = localStorage.getItem('siteLang') || 'bn';
-            
             const sendId = document.getElementById('sendMethod').value;
             const receiveId = document.getElementById('receiveMethod').value;
             const sendObj = methods.find(m => m.id === sendId);
@@ -1230,60 +1113,27 @@
             document.getElementById('trxError').classList.add('hidden');
             document.getElementById('receiverError').classList.add('hidden');
             document.getElementById('rangeWarning').classList.add('hidden');
-            document.getElementById('userNumber').classList.remove('input-error');
-            document.getElementById('userTrxID').classList.remove('input-error');
-            document.getElementById('receiverDetails').classList.remove('input-error');
 
             const result = calculateValues(sendAmount, sendObj, receiveObj);
             updateBreakdownUI(sendAmount, result, sendObj, receiveObj);
 
             let isValid = true;
             let currentUsdToBdt = CONFIG.rates.usdToBdt;
-            if (sendObj.type === 'usd' && CONFIG.platformRates[sendObj.id] && CONFIG.platformRates[sendObj.id].sell) {
-                currentUsdToBdt = CONFIG.platformRates[sendObj.id].sell;
-            }
+            if (sendObj.type === 'usd' && CONFIG.platformRates[sendObj.id]?.sell) currentUsdToBdt = CONFIG.platformRates[sendObj.id].sell;
 
-            if (!sendAmount || isNaN(sendAmount)) {
-                isValid = false;
-            } else {
+            if (!sendAmount || isNaN(sendAmount)) isValid = false;
+            else {
                 let equivalentBDT = (sendObj.type === 'bdt') ? sendAmount : sendAmount * currentUsdToBdt;
-                
-                if (equivalentBDT < CONFIG.minBDTValue) {
+                if (equivalentBDT < CONFIG.minBDTValue || equivalentBDT > CONFIG.maxBDTValue) {
                     isValid = false;
-                    const minAmount = (sendObj.type === 'bdt') ? `${CONFIG.minBDTValue} BDT` : `${(CONFIG.minBDTValue / currentUsdToBdt).toFixed(2)} USD`;
-                    showWarning((lang === 'en') ? `Minimum amount is ${minAmount}` : `সর্বনিম্ন পরিমাণ ${minAmount}`);
-                } 
-                else if (equivalentBDT > CONFIG.maxBDTValue) {
-                    isValid = false;
-                    const maxAmount = (sendObj.type === 'bdt') ? `${CONFIG.maxBDTValue} BDT` : `${(CONFIG.maxBDTValue / currentUsdToBdt).toFixed(2)} USD`;
-                    showWarning((lang === 'en') ? `Maximum limit is ${maxAmount}` : `সর্বোচ্চ লিমিট ${maxAmount}`);
+                    showWarning(`Limit: ${CONFIG.minBDTValue} - ${CONFIG.maxBDTValue} BDT`);
                 }
             }
 
-            if (userNumber.length !== 4 || isNaN(userNumber)) {
-                if(userNumber.length > 0) {
-                    document.getElementById('senderError').classList.remove('hidden');
-                    document.getElementById('userNumber').classList.add('input-error');
-                }
-                isValid = false;
-            }
-
-            if (!userTrxID || (sendObj.trxPattern && !sendObj.trxPattern.test(userTrxID.trim().toUpperCase()))) {
-                if(userTrxID.length > 0 && sendObj.trxPattern) {
-                    document.getElementById('trxError').classList.remove('hidden');
-                    document.getElementById('userTrxID').classList.add('input-error');
-                }
-                isValid = false;
-            }
-
-            if (!userDate || !userHour || !userMin || !userWhatsapp || userWhatsapp.length < 11) isValid = false;
-
+            if (userNumber.length !== 4 || isNaN(userNumber)) { if(userNumber.length > 0) document.getElementById('senderError').classList.remove('hidden'); isValid = false; }
+            if (!userTrxID) { if(userTrxID.length > 0) document.getElementById('trxError').classList.remove('hidden'); isValid = false; }
+            if (!userDate || !userWhatsapp || userWhatsapp.length < 11) isValid = false;
             if (!receiverDetails) isValid = false;
-            else if (receiveObj.type === 'bdt' && receiveObj.receiverPattern && !receiveObj.receiverPattern.test(receiverDetails.trim())) {
-                document.getElementById('receiverError').classList.remove('hidden');
-                document.getElementById('receiverDetails').classList.add('input-error');
-                isValid = false;
-            }
 
             const btn = document.getElementById('submitBtn');
             const previewBox = document.getElementById('dynamicSendPreview');
@@ -1304,32 +1154,13 @@
         }
 
         function updateBreakdownUI(amount, result, sendObj, receiveObj) {
-            if (!amount || isNaN(amount)) { document.getElementById('calcBreakdown').classList.add('hidden'); return; }
-            
-            let currentUsdToBdt = CONFIG.rates.usdToBdt;
-             if (sendObj.type === 'usd' && CONFIG.platformRates[sendObj.id] && CONFIG.platformRates[sendObj.id].sell) {
-                currentUsdToBdt = CONFIG.platformRates[sendObj.id].sell;
-            }
-
-             let equivalentBDT = (sendObj.type === 'bdt') ? amount : amount * currentUsdToBdt;
-             if(equivalentBDT < CONFIG.minBDTValue || equivalentBDT > CONFIG.maxBDTValue) {
-                 document.getElementById('calcBreakdown').classList.add('hidden');
-                 return;
-             }
-
+            if (!amount || isNaN(amount) || result.finalAmount <= 0) { document.getElementById('calcBreakdown').classList.add('hidden'); return; }
             document.getElementById('calcBreakdown').classList.remove('hidden');
-            const lang = localStorage.getItem('siteLang') || 'bn';
-            document.getElementById('rateDisplay').innerText = result.rateText;
-            document.getElementById('feeLabel').innerText = (lang === 'en') ? `Fee ${result.feeDesc}:` : `ফি চার্জ ${result.feeDesc}:`;
-            document.getElementById('feeDisplay').innerText = `- ${result.fee.toFixed(2)} ${sendObj.type.toUpperCase()}`;
             
-            if(result.extraSendFee > 0) {
-                document.getElementById('sendFeeRow').classList.remove('hidden');
-                // Calculate display based on SEND UNIT for clarity, or just keep BDT
-                // Keeping BDT as "Send Money Charge" implies TK
-                let extraDisplay = `${result.extraSendFee} BDT`;
-                document.getElementById('sendFeeDisplay').innerText = `- ${extraDisplay}`;
-            } else document.getElementById('sendFeeRow').classList.add('hidden');
+            document.getElementById('rateDisplay').innerText = result.rateText;
+            document.getElementById('feeLabel').innerHTML = result.feeDesc; // Breakdown Text
+            document.getElementById('feeDisplay').innerText = `- ${result.fee.toFixed(2)} ${sendObj.type.toUpperCase()}`;
+            document.getElementById('sendFeeRow').classList.add('hidden'); 
 
             document.getElementById('receiveAmount').innerText = result.finalAmount.toFixed(2);
             document.getElementById('finalReceiveDisplay').innerText = `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`;
@@ -1337,17 +1168,39 @@
 
         function showWarning(msg) { document.getElementById('rangeWarning').classList.remove('hidden'); document.getElementById('warningText').innerText = msg; }
 
-        function processOrder() {
-            if(!isShopOpen) { 
-                document.getElementById('timePopup').classList.remove('hidden'); 
-                document.getElementById('timePopup').classList.add('flex'); 
-                return; 
+        // 🔥 Rate Limiting Check Logic
+        function checkRateLimit() {
+            const NOW = Date.now();
+            const TIME_WINDOW = 60000; // 1 minute
+            const MAX_REQUESTS = 10;
+            
+            let requests = JSON.parse(localStorage.getItem('request_logs') || '[]');
+            // Filter out old requests
+            requests = requests.filter(time => NOW - time < TIME_WINDOW);
+            
+            if (requests.length >= MAX_REQUESTS) {
+                return false;
             }
+            
+            requests.push(NOW);
+            localStorage.setItem('request_logs', JSON.stringify(requests));
+            return true;
+        }
+
+        // 🔥 Process Order with Strict Validation & Server Duplicate Check
+        async function processOrder() {
+            if(!isShopOpen) { document.getElementById('timePopup').classList.remove('hidden'); document.getElementById('timePopup').classList.add('flex'); return; }
+            
+            // 🛑 1. Rate Limiting Check
+            if(!checkRateLimit()) {
+                showToast("ERR_RATE_LIMIT: Too many requests! Wait 1 min.", "error");
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             if(btn.disabled) return;
-
-            fireConfetti();
-
+            
+            // Collect Data
             const sendAmount = parseFloat(document.getElementById('sendAmount').value);
             const userNumber = document.getElementById('userNumber').value.trim().toUpperCase();
             const userTrxID = document.getElementById('userTrxID').value.trim().toUpperCase();
@@ -1363,138 +1216,157 @@
             const receiveId = document.getElementById('receiveMethod').value;
             const sendObj = methods.find(m => m.id === sendId);
             const receiveObj = methods.find(m => m.id === receiveId);
+
+            // 🛑 2. Strict Data Validation (Local)
+            if(isNaN(sendAmount) || sendAmount <= 0) { showToast("ERR_INVALID_AMOUNT: Amount must be a number", "error"); return; }
+            
+            let equivalentBDT = (sendObj.type === 'bdt') ? sendAmount : sendAmount * (CONFIG.platformRates[sendObj.id]?.sell || CONFIG.rates.usdToBdt);
+            if (equivalentBDT < CONFIG.minBDTValue || equivalentBDT > CONFIG.maxBDTValue) {
+                showToast(`ERR_LIMIT_EXCEEDED: Min ${CONFIG.minBDTValue} - Max ${CONFIG.maxBDTValue} BDT`, "error");
+                return;
+            }
+
+            // Strict Regex Checking
+            if(!sendObj.senderPattern.test(userNumber)) { showToast("ERR_INVALID_SENDER_ID: Format mismatch", "error"); return; }
+            
+            // 🔥 REMOVED TrxID FORMAT CHECK as requested
+            // if(!sendObj.trxPattern.test(userTrxID)) { showToast("ERR_INVALID_TRX_ID: Invalid TrxID format", "error"); return; }
+            
+            if(receiveObj.type === 'bdt' && !patterns.bdNumber.test(receiverDetails)) { showToast("ERR_INVALID_RECEIVER: Invalid BD Number", "error"); return; }
+            
+            // 🛑 3. Duplicate TrxID Check (Local Cache)
+            let pastTrx = JSON.parse(localStorage.getItem('submitted_trx') || '[]');
+            if(pastTrx.includes(userTrxID)) {
+                showToast("ERR_DUPLICATE_TRX: Transaction ID already submitted!", "error");
+                return;
+            }
+
+            // 🛑 4. SERVER DUPLICATE CHECK (NEW FEATURE)
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking...';
+            btn.disabled = true;
+
+            try {
+                // Fetch all orders to check for duplicate TrxID on server
+                const checkResponse = await fetch(`${GOOGLE_SCRIPT_URL}?action=read&t=${Date.now()}`);
+                const historyData = await checkResponse.json();
+                
+                // Check if TrxID exists in history (Server Side Check)
+                const isServerDuplicate = Array.isArray(historyData) && historyData.some(item => 
+                    item.trxId && item.trxId.toString().trim().toUpperCase() === userTrxID
+                );
+                
+                if (isServerDuplicate) {
+                    showToast("ERR_DUPLICATE_SERVER: This TrxID is already used!", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnText; // Restore button
+                    return; // STOP HERE
+                }
+
+            } catch (error) {
+                console.error("Server Check Failed", error);
+                showToast("ERR_CONNECTION: Could not verify TrxID with server.", "error");
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+                return; // Stop if we can't verify
+            }
+
+            // If unique on server, proceed to submit
+            // Save TrxID locally
+            pastTrx.push(userTrxID);
+            if(pastTrx.length > 50) pastTrx.shift(); 
+            localStorage.setItem('submitted_trx', JSON.stringify(pastTrx));
+
+            fireConfetti();
             const result = calculateValues(sendAmount, sendObj, receiveObj);
 
-            const sheetData = {
+            lastOrderData = {
                 platform: `${sendObj.name} To ${receiveObj.name}`,
                 type: sendObj.type,
                 userIdentifier: userNumber,
                 trxId: userTrxID,
                 amountReceived: `${sendAmount} ${sendObj.type.toUpperCase()}`,
                 amountSent: `${result.finalAmount.toFixed(2)} ${receiveObj.type.toUpperCase()}`,
-                receiverDetails: `'${receiverDetails}`,
-                contact: `'${userWhatsapp}`, 
-                timestamp: `${userDate} | ${formattedTime}`, 
+                receiverDetails: receiverDetails,
+                contact: userWhatsapp, 
+                timestamp: `${userDate} | ${formattedTime}`,
                 rawDate: userDate,
                 action: "create" 
             };
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(sheetData)
-            }).catch(err => console.error("Sheet Error:", err));
+            // ✅ UPDATE BUTTON TO "SENDING..." after check passes
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane fa-beat"></i> Sending...';
 
-            setTimeout(() => {
-                const message = `*🚀 NEW ORDER PLACED!*
-------------------
-TrxID: ${userTrxID}
-Amount: ${sendAmount}
-------------------
-✅ *Status: PENDING*`.trim();
-                window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-                location.reload(); 
-            }, 3000); 
+            // 🔥 STOPPED FETCH HERE! Fetch will happen ONLY inside generateReceipt
+            // fetch(GOOGLE_SCRIPT_URL, ... ) <-- REMOVED
+
+            const receiptModal = document.getElementById('receiptModal');
+            receiptModal.classList.remove('hidden');
+            receiptModal.classList.add('flex');
+
+            // --- 🛑 REMOVED AUTOMATIC REDIRECT ---
+            // The redirect will now happen when they click "Download Receipt"
         }
 
+        // ✅ Updated Copy Logic to remove quotes
         function copyToClipboard(elementId) {
             const el = document.getElementById(elementId);
-            const text = el.getAttribute('data-copy-value') || el.innerText;
-            const textarea = document.createElement("textarea");
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try { document.execCommand('copy'); showToast("Copied! ✅", "success"); } 
-            catch (err) { showToast("Failed!", "error"); }
-            document.body.removeChild(textarea);
+            let text = el.getAttribute('data-copy-value') || el.innerText;
+            
+            // Fix: Remove quotes and clean text
+            text = text.replace(/['"]/g, '');
+            
+            // Safety fallback if extra digits still exist
+            if(text.includes("-(")) {
+                text = text.split("-(")[0];
+            }
+
+            navigator.clipboard.writeText(text).then(() => showToast("Copied! ✅", "success"));
         }
 
         function showToast(msg, type) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             document.getElementById('toastIcon').innerHTML = type === 'success' ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-xmark text-red-400"></i>';
+            
+            // Error Styling
+            if(type === 'error') {
+                toast.classList.remove('bg-slate-900/90', 'border-white/10');
+                toast.classList.add('bg-red-900/90', 'border-red-500/50');
+            } else {
+                toast.classList.add('bg-slate-900/90', 'border-white/10');
+                toast.classList.remove('bg-red-900/90', 'border-red-500/50');
+            }
+
             toast.style.transform = "translateX(0)";
             setTimeout(() => { toast.style.transform = "translateX(200%)"; }, 3000);
         }
-
-        function toggleFullQR() {
-            const modal = document.getElementById('qrModal');
-            if(modal.classList.contains('hidden')) { modal.classList.remove('hidden'); modal.classList.add('flex'); } 
-            else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-        }
-
+        function toggleFullQR() { const modal = document.getElementById('qrModal'); if(modal.classList.contains('hidden')) { modal.classList.remove('hidden'); modal.classList.add('flex'); } else { modal.classList.add('hidden'); modal.classList.remove('flex'); } }
         function fireConfetti() {
-            const canvas = document.getElementById('confetti');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            const canvas = document.getElementById('confetti'); const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             const particles = [];
-            for(let i=0; i<200; i++) {
-                particles.push({ x: canvas.width / 2, y: canvas.height / 2, vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20, color: `hsl(${Math.random() * 360}, 100%, 60%)`, size: Math.random() * 6 + 2, life: 100 });
-            }
+            for(let i=0; i<200; i++) particles.push({ x: canvas.width/2, y: canvas.height/2, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, color: `hsl(${Math.random()*360}, 100%, 60%)`, size: Math.random()*6+2, life: 100 });
             function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                ctx.globalCompositeOperation = 'lighter';
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    let p = particles[i];
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.vx *= 0.95; p.life--;
-                    if (p.life <= 0) { particles.splice(i, 1); continue; }
-                    ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-                }
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.globalCompositeOperation = 'lighter';
+                for (let i=particles.length-1; i>=0; i--) { let p = particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.vx*=0.95; p.life--; if (p.life<=0) { particles.splice(i, 1); continue; } ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); }
                 if(particles.length > 0) requestAnimationFrame(animate); else ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-            animate();
+            } animate();
         }
-
         function generateStaticTicker() {
             const list = document.getElementById('transactionList');
             const listClone = document.getElementById('transactionListClone');
-            let html = "";
-            const platforms = [...methods];
+            let html = ""; const platforms = [...methods];
             for(let i=0; i<10; i++) {
                 const platform = platforms[Math.floor(Math.random() * platforms.length)];
-                let amt = 0;
-                
-                if(platform.type === 'bdt') amt = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
-                else amt = (Math.random() * (5.00 - 0.50) + 0.50).toFixed(2);
-                
-                let maskedID = "";
-                if(platform.type === 'bdt') {
-                    const prefixes = ['017', '019', '018', '016', '015', '013'];
-                    const pre = prefixes[Math.floor(Math.random() * prefixes.length)];
-                    maskedID = `${pre}****${Math.floor(Math.random() * 9000 + 1000)}`;
-                } else {
-                    maskedID = `${Math.floor(Math.random() * 900 + 100)}*****${Math.floor(Math.random() * 90 + 10)}`;
-                }
-
+                let amt = (platform.type === 'bdt') ? Math.floor(Math.random()*(500-50+1))+50 : (Math.random()*(5.00-0.50)+0.50).toFixed(2);
+                let maskedID = (platform.type === 'bdt') ? `01${Math.floor(Math.random()*5+5)}****${Math.floor(Math.random()*9000+1000)}` : `${Math.floor(Math.random()*900+100)}*****`;
                 const isSent = Math.random() > 0.5;
                 const colorClass = isSent ? "text-red-400" : "text-emerald-400"; 
                 const icon = isSent ? "fa-arrow-up" : "fa-arrow-down";
-                const logoHtml = `<img src="${platform.logo}" class="w-full h-full rounded-full object-contain bg-white p-1" onerror="this.src='https://via.placeholder.com/32?text=${platform.name[0]}'" loading="lazy">`;
-
-                html += `
-                    <div class="flex items-center gap-3 bg-white/5 p-2.5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors">
-                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center p-1 shadow-lg border border-white/10">
-                            ${logoHtml}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <p class="text-xs text-gray-200 font-bold truncate">${platform.name}</p>
-                                <span class="text-[9px] text-gray-500 font-mono">${maskedID}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-emerald-500 flex items-center gap-1"><i class="fa-solid fa-check-circle"></i> Success</span>
-                                <p class="text-[10px] ${colorClass} font-bold flex items-center gap-1">
-                                    <i class="fa-solid ${icon}"></i> ${amt} ${platform.type.toUpperCase()}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="flex items-center gap-3 bg-white/5 p-2.5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors"><div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center p-1 shadow-lg border border-white/10"><img src="${platform.logo}" class="w-full h-full rounded-full object-contain bg-white p-1"></div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-0.5"><p class="text-xs text-gray-200 font-bold truncate" style="color: var(--text-color)">${platform.name}</p><span class="text-[9px] text-gray-500 font-mono">${maskedID}</span></div><div class="flex justify-between items-center"><span class="text-[10px] text-emerald-500 flex items-center gap-1"><i class="fa-solid fa-check-circle"></i> Success</span><p class="text-[10px] ${colorClass} font-bold flex items-center gap-1"><i class="fa-solid ${icon}"></i> ${amt} ${platform.type.toUpperCase()}</p></div></div></div>`;
             }
-            list.innerHTML = html;
-            listClone.innerHTML = html; 
+            list.innerHTML = html; listClone.innerHTML = html; 
         }
     </script>
 </body>
